@@ -8,8 +8,8 @@ Each subfolder contains its own readme with additional information for each stag
 # FYI / FAQS
 There are several things you need to know.
 ### Allowing for class-compliant midi
-To let ESP32-s3 appear as a class compliant device, you *must* set the ‘USB Mode’ for the board as “USB OTG(TinyUSB)”. You can find this setting in the Arduino <Tools> menu.
+To let ESP32-s3 appear as a class compliant device, you *must* set the ‘USB Mode’ for the board as “USB OTG(TinyUSB)”. You can find this setting in the Arduino *Tools* menu.
 ### Reprogramming after setting USB OTG
 Once the board is set to USB OTG mode it won’t show up in Arduino as a Serial device. In order to reprogram the device you must manually hold down the ‘boot’ button on the ESP32-s3, and then press press and release the ‘reset’ on the ESP32-s3.
 ### Allowing for Serial debugging
-In order to use serial.print debugging, you *must* set “USB CDC on boot” to “enabled”. You can find this setting in the Arduino <Tools> menu.
+In order to use serial.print debugging, you *must* set “USB CDC on boot” to “enabled”. You can find this setting in the Arduino *Tools* menu.
