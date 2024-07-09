@@ -5,15 +5,19 @@
 #include "led.h"
 
 const byte ENABLE_USB_MIDI = 1;
+const byte SERIAL_DEBUG = 0;
 
 LSM6 imu;
+uint8_t accelCCs[] = {10,11,12,13};
 
 const byte numPots = 4;
 //for potentiometers the first argument is the pin number, the second is a flag if the pot is reversed
 Potentiometer pots[numPots] = {Potentiometer(2), Potentiometer(9, 1), Potentiometer(8, 1), Potentiometer(6)};
+uint8_t potCCs[] = {0,1,2,3};
 
 const byte numButtons = 4;
 Button buttons[numButtons] = { Button(3), Button(4), Button(5), Button(7) };
+uint8_t buttonNoteNums[] = {48,50,53,55};
 
 LED led(11,12,13);
 
@@ -38,7 +42,11 @@ void loop() {
   for(byte i=0;i<numPots;i++){
     int val = pots[i].read();
     if( val >= 0 ) {
-      Serial.println("Pot " + String(i) + ": " + String(val));
+      if(SERIAL_DEBUG) Serial.println("Pot " + String(i) + ": " + String(val));
+      else {
+        sendMidiCC( potCCs[i], val);
+      }
+
       if(i==0) led.setRed(val*2);
       if(i==1) led.setGreen(val*2);
       if(i==2) led.setBlue(val*2);
@@ -47,20 +55,25 @@ void loop() {
 
   for(byte i=0;i<numButtons;i++){
     buttons[i].loop();
-    if( buttons[i].isPressed()) Serial.println("Button " + String(i) + " pressed ");
-    else if( buttons[i].isReleased()) Serial.println("Button " + String(i) + " released ");
+    if(SERIAL_DEBUG){
+      if( buttons[i].isPressed()) Serial.println("Button " + String(i) + " pressed ");
+      else if( buttons[i].isReleased()) Serial.println("Button " + String(i) + " released ");
+    } else{
+      if( buttons[i].isPressed()) sendMidiNoteOn( buttonNoteNums[i], 127 );
+      else if( buttons[i].isReleased()) sendMidiNoteOff( buttonNoteNums[i] );
+    }
   }
 
 
 
   // Handle MIDI output
-  if (millis() - last_midi_time >= tempo) {
-    sendMidiNote();
-    // uint16_t val = (uint16_t)sensor.getDistance();
-    // val = val < 30 ? 0 : val > 500 ? 127 : (val-30)/4;
-    // sendMidiCC(val);
-    last_midi_time = millis();
-  }
+  // if (millis() - last_midi_time >= tempo) {
+  //   sendMidiNoteOn();
+  //   // uint16_t val = (uint16_t)sensor.getDistance();
+  //   // val = val < 30 ? 0 : val > 500 ? 127 : (val-30)/4;
+  //   // sendMidiCC(val);
+  //   last_midi_time = millis();
+  // }
 
   static uint32_t timer = 0;
   if(millis()-timer > 10){
