@@ -13,3 +13,11 @@ To let ESP32-s3 appear as a class compliant device, you *must* set the ‘USB Mo
 Once the board is set to USB OTG mode it won’t show up in Arduino as a Serial device. In order to reprogram the device you must manually hold down the ‘boot’ button on the ESP32-s3, and then press press and release the ‘reset’ on the ESP32-s3.
 ### Allowing for Serial debugging
 In order to use serial.print debugging, you *must* set “USB CDC on boot” to “enabled”. You can find this setting in the Arduino *Tools* menu.
+
+# Components
+There are three components to this project:
+1. The PCB and electronics assembly
+2. The enclosure and mechanical elements
+3. The firmware for the ESP-32-S3
+
+Instructions on how to complete the project are in the readme's for these three subfolders. 
