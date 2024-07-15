@@ -3,7 +3,7 @@ Handles IMU input and sends MIDI data
 */
 
 const byte IMU_DEBUG = 0; //enable to see data in arduino console
-const int IMU_DATA_RANGE = 10000 //the maximum accerlation value we are interested in
+const int IMU_DATA_RANGE = 10000; //the maximum accerlation value we are interested in
 
 void imuSetup(){
   Wire.begin(44,43);

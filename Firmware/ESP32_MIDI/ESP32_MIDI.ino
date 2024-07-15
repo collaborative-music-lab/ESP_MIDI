@@ -6,6 +6,11 @@
 
   Description:
   This program allows an ESP32_S3 to act as a class compliant midi device.
+  NOTE: the ESP32 USB Mode MUST be set to "USB OTG (TinyUSB)".
+  - once this is done, the board will no longer be recongized by Arduino
+  - in order to reprogram the board, you will need to hold down the buttons on the board
+  - hold down the B (boot) button and tap the R (reset) button
+  - Arduino should recognize the ESP32s3
   
   Input Signals:
   - IMU (Inertial Measurement Unit): 
