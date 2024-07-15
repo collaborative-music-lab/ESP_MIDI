@@ -10,6 +10,8 @@ The project consists of:
 
 ## Assembly
 
+Make sure get your enclosure drilled for your faceplate before you mount your PCB to the faceplate in step 9!!!
+
 1. Place two potentiometers on the PCB. Make sure they are flat. It is a good idea to place the potentiometers on a faceplate to make sure they are aligned. Solder the potentiometers in place.
 	* the potentiometers go on the opposite side of the PCB from the ESP32 (e.g. the ESP32 is on the bottom, and the potentiometers are on the top).
 2. The LED uses 3 resistors with values between 120 and 470 ohm. All resistors may be the same value. Place and solder the resistors. 
