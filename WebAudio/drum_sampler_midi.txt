@@ -68,6 +68,6 @@ setCCHandler(( cc, value ) => {
 console.log(delay.delay.get())
 console.log(delay_send.get())
 
-let scope = new Oscilloscope('Sampler')
+let scope = new Oscilloscope('Canvas2')
 output.connect(scope.input)
 scope.setFftSize(1024*32)
