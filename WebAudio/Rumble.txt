@@ -1,0 +1,57 @@
+//Synth, MIDI, and sequencer
+//
+let s = new Rumble()
+const output = new Tone.Multiply(0.1).toDestination()
+s.connect(output)
+//
+let scope = new Oscilloscope('Canvas2')
+scope.gain.value = 8
+let spectrum = new Spectroscope('Canvas3')
+s.connect(spectrum.input)
+output.connect(scope.input)
+//both envelopes are ADSR
+s.setADSR( .01, .5, 0.5, 2)
+s.setFilterADSR( .01, .2, 0.2, 1)
+// 3 oscillators get individual values
+// arguments are osc1value, osc2value, osc3value
+s.setDetune(1,1.01,2)
+s.setPwmDepth(0,.4,.5)
+s.setGain(1,.8,.8)
+//other parameters are set using .value
+s.cutoff.value = 1000
+s.vcf_env_depth.factor.value = 1000
+s.lfo.frequency.value = 2
+//tempo control for sequencer:
+Tone.Transport.bpm.value = 90
+
+//manually trigger notes
+s.triggerAttack(60,1)
+s.triggerRelease()
+
+//use keyboard input
+setNoteOnHandler((note,vel)=>{
+  s.triggerAttack(note,vel)
+})
+setNoteOffHandler((note)=>{
+  s.triggerRelease()
+})
+
+//helper functions to convert notes to frequency
+const ntom = function(note, octave=3){
+  octave = octave*12 + Math.floor(note/7)*12
+  note = [0,2,4,5,7,9,11][ note % 7]
+  return note + octave
+} 
+
+//use sequencer
+let seq = [0,1,2,3,4,5,6,7]
+let index = 0
+let note = 0
+//sequence.stop()
+let sequence  = new Tone.Loop((time)=>{
+  note = ntom( seq[index % seq.length] )
+  s.triggerAttackRelease(note,100,.2,time)
+  index = (index+1) % seq.length
+},'16n').start()
+//sequence.start()
+Tone.Transport.start()

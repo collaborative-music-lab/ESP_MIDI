@@ -1,0 +1,46 @@
+//Basic MIDI synth
+//
+//create our audio objects
+const vco = new Tone.Oscillator().start()
+const vcf = new Tone.Filter()
+const vca = new Tone.Multiply()
+const output = new Tone.Multiply(0.1).toDestination()
+//connect them
+vco.connect(vcf), vcf.connect(vca), vca.connect(output)
+//
+//make our visualizers
+let scope = new Oscilloscope('Canvas2')
+scope.gain.value = 1
+let spectrum = new Spectroscope('Canvas3')
+output.connect(spectrum.input)
+output.connect(scope.input)
+//
+//both envelopes are ADSR
+const env = new Tone.Envelope()
+const vcf_env_depth = new Tone.Multiply(1000)
+const cutoff = new Tone.Signal(100)
+env.connect( vca.factor ), env.connect( vcf_env_depth )
+cutoff.connect( vcf.frequency)
+vcf_env_depth.connect( vcf.frequency )
+//
+//setup our midi handlers
+setNoteOnHandler((note,vel)=>{
+  note = Tone.Midi(note).toFrequency()
+  vco.frequency.value = note
+  env.triggerAttack()
+})
+setNoteOffHandler((note)=>{
+  env.triggerRelease()
+})
+
+//set our parameters
+vco.type = 'square' //or 'sawtooth', 'triangle', 'sine'
+cutoff.value = 200 //filter cutoff freq in Hertz
+vcf.Q.value = 5
+vcf.type = 'lowpass' //or 'highpass'
+//envelope ADSR settings in ms
+env.attack = .01
+env.decay = .1
+env.sustain = .5 //this is an amplitude 0-1
+env.release = 2
+vcf_env_depth.factor.value = 2000

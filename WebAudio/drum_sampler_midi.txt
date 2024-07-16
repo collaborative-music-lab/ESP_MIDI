@@ -1,0 +1,73 @@
+//any samples from https://github.com/Tonejs/audio should be able to be loaded
+let kick = new Tone.Player("https://tonejs.github.io/audio/drum-samples/Kit8/kick.mp3")
+let snare = new Tone.Player("https://tonejs.github.io/audio/drum-samples/Kit8/snare.mp3")
+let hat = new Tone.Player("https://tonejs.github.io/audio/drum-samples/Kit8/hihat.mp3")
+let tom = new Tone.Player("https://tonejs.github.io/audio/drum-samples/Kit8/tom3.mp3")
+//effects chain
+let hpf = new Tone.Filter({type:'highpass', rolloff:-12, Q:1})
+let lpf = new Tone.Filter({rolloff:-24, Q:4})
+let verb_send = new Tone.Multiply()
+let verb = new ToneWood()
+let delay_send = new Tone.Multiply()
+let delay = new DelayOp()
+//output
+const output = new Tone.Multiply(0.1).toDestination()
+//connects
+kick.connect(hpf)
+snare.connect(hpf)
+hat.connect(hpf)
+tom.connect(hpf)
+hpf.connect(lpf)
+lpf.connect(output)
+lpf.connect(delay_send), delay_send.connect(delay.input)
+lpf.connect(verb_send), verb_send.connect(verb.input)
+delay.connect(output), verb.connect(output)
+// parameters
+delay.delay.delayTime.value = .125
+verb.load("/m080/audio/plate_reverb.mp3")
+
+setMidiInput(2)
+
+let curNote = 0
+setNoteOnHandler( (note,vel)=>{
+  switch(note){
+    case 36: kick.start(); break;
+    case 38: snare.start(); break;
+    case 42: hat.start(); break;
+    case 46: tom.start(); break;
+  }
+  console.log(note, curNote)
+})
+setNoteOffHandler( (note,vel)=>{
+  // curNote = Tone.Midi(note).toFrequency()
+  // sampler.triggerRelease(curNote)
+})
+
+let accel = [0,0,0]
+setCCHandler(( cc, value ) => { 
+  switch(cc){
+    case 0: hpf.frequency.value = value*10 + 10; break;
+    case 1: delay.delay.feedback.value = value/127; break;
+    case 2: delay.delay.delayTime.value = value/(127*8); break;
+    case 3: verb_send.factor.value = value/127; break;
+    case 10: 
+      accel[0] = value;
+      lpf.frequency.value = Math.pow(value/127,2)*10000 + 100; 
+      break;
+    case 11: 
+      accel[1] = value;
+      delay_send.factor.value = Math.pow(Math.abs(value-64)/64,2); 
+      break;
+    case 12: 
+      accel[2] = value; 
+      break;
+  }
+  console.log(accel)
+}) 
+
+console.log(delay.delay.get())
+console.log(delay_send.get())
+
+let scope = new Oscilloscope('Sampler')
+output.connect(scope.input)
+scope.setFftSize(1024*32)

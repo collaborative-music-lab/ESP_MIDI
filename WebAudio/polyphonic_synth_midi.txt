@@ -1,0 +1,310 @@
+//polyphonic synth sequences
+setMidiInput(2)
+//
+const s = new Daisies()
+let verb_send = new Tone.Multiply()
+let verb = new ToneWood()
+let delay_send = new Tone.Multiply()
+let delay = new DelayOp()
+const output = new Tone.Multiply(0.1).toDestination()
+//connects
+s.connect(output)
+s.connect(delay_send), delay_send.connect(delay.input)
+s.connect(verb_send), verb_send.connect(verb.input)
+delay.connect(output), verb.connect(output)
+
+// parameters
+delay_send.factor.value = .1
+verb_send.factor.value = .4
+delay.delay.delayTime.value = .125
+verb.load("/m080/audio/plate_reverb.mp3")
+verb.output.factor.value = 4
+s.setADSR(0.01,.4,.3,2)
+s.setFilterADSR(0.1,.5,0.2,1)
+s.setFilterEnvDepth(0)
+s.setCutoff(700)
+s.setResonance(2)
+s.setVcoGain(0,.2)
+s.setVcoGain(1,.2)
+let sustainTime = [.1,.2,.5,1]
+Tone.Transport.bpm.value = 90
+//
+let gui = new p5(sketch, Canvas1)
+let scope = new Oscilloscope('Canvas2')
+let spectrum = new Spectroscope('Canvas3')
+s.connect(spectrum.input)
+verb.connect(scope.input)
+
+let enable = [0,0,0,0]
+let rates = [4,8,12,16]
+let seq = [
+  [0,4,7,4],
+  [7,6,5,4],
+  [7,6,8,9],
+  [10,9,8,7]]
+let index = [0,0,0,0]
+let count = 0
+//
+let scale = [0,2,4,5,7,9,11]
+let octave = [3,4,5,6]
+let decay_scalar = 1
+//
+//sequencer.stop()
+let sequencer = new Tone.Loop((time)=>{
+  for(let i=0;i<4;i++){
+    if(enable[i]>0){
+      if(count%rates[i] == 0){
+        let note = seq[i][index[i]]
+        note = scale[note%scale.length] + Math.floor(note/7)*12
+        note = note + octave[i]*12
+        s.triggerAttackRelease(note,100,sustainTime[i],time)
+        index[i] = (index[i]+1) % seq[i].length
+      }
+    }
+  }
+  count++
+},'32n')
+sequencer.start()
+Tone.Transport.start()
+
+setNoteOnHandler((note,vel)=>{
+  switch(note){
+    case 36: enable[0] = 1; break;
+    case 38: enable[1] = 1; break;
+    case 42: enable[2] = 1; break;
+    case 46: enable[3] = 1; break;
+  }
+  console.log('on', note)
+})
+setNoteOffHandler((note)=>{
+  switch(note){
+    case 36: enable[0] = 0; break;
+    case 38: enable[1] = 0; break;
+    case 42: enable[2] = 0; break;
+    case 46: enable[3] = 0; break;
+  }
+  console.log('off', note)
+})
+
+const cutoff_knob = gui.Knob({
+  label: 'cutoff',
+  callback: (x)=>{ 
+    //s.setCutoffCV(x)
+    s.setCutoff(x)
+    s.setFilterEnvDepth(x)
+  },
+  min: 10, max: 5000, curve: 2
+})
+//
+const decay_knob = gui.Knob({
+  label: 'decay',
+  callback: (x)=>{ 
+    s.setADSR(.01,x,0,x)
+    s.setFilterADSR(.01,x,0,x)
+  },
+  min: .01, max: 4, curve: 2
+})
+//
+let possibleRates = [2,4,6,8,12,16,24,32]
+const rate_knob = gui.Knob({
+  label: 'rate',
+  callback: (x)=>{ 
+    x = Math.floor(x/16)
+    rates[0] = possibleRates[ x % possibleRates.length ]
+    rates[1] = possibleRates[ (x + 6) % possibleRates.length ]
+    rates[2] = possibleRates[ (x + 4) % possibleRates.length ]
+    rates[3] = possibleRates[ (x + 1) % possibleRates.length ]
+    console.log(rates)
+  },
+  min: 0, max: 127
+})
+//
+const delay_time_knob = gui.Knob({
+  label: 'delay',
+  mapto: delay.delay.delayTime,
+  min: 0.01, max: 1, curve: 2
+})
+//
+const delay_fb_knob = gui.Knob({
+  label: 'feedback',
+  mapto: delay.delay.feedback,
+  min: 0.0, max: 0.99, curve: 3
+})
+//
+const delay_knob = gui.Knob({
+  label: 'delay lvl',
+  mapto: delay_send.factor,
+  min: 0, max: 1, curve: 2
+})
+
+let accel = [0,0,0]
+setCCHandler((cc,val)=>{
+  switch(cc){
+    case 0: cutoff_knob.set(val*50+10); break;
+    case 1: decay_knob.set(val/32 + .01); break;
+    case 2: rate_knob.set(val); break;
+    case 3: delay_knob.set(val/127); break;
+    case 10: 
+      accel[0] = val;
+      s.setResonance( 15 - val/127*15); 
+      break;
+    case 11: 
+      accel[1] = val;
+      verb_send.factor.value = Math.pow(Math.abs(val-64)/64,1)*1; 
+      break;
+    case 12: 
+      accel[2] = val; 
+      break;
+  }
+  console.log(accel)
+})
+
+  
+/*
+let rumble= new Rumble()
+let strip = new Stripe()
+let delay = new Caverns()
+let output = new Tone.Multiply(.1).toDestination()
+rumble.connect(strip.input), strip.send.connect(delay.input)
+strip.connect(output),  delay.connect(output)
+output.factor.rampTo(.2,1)
+//
+let gui = new p5(sketch, Canvas1)
+gui.Text({label:'RUMBLE', x:50,y:50,size:5,textColor:[255,0,0]})
+// rumble.gui = gui
+// rumble.initGui()
+//
+rumble.setPwmDepth(.49,.2,.4)
+rumble.setDetune(1,1.51,1.99)
+rumble.sub_freq.factor.value = .5
+rumble.sub_gain.factor.value = .1
+rumble.setGain(.2,.1,.1)
+rumble.clip.factor.value = .5
+
+rumble.cutoff.value = 100
+rumble.vcf_env_depth.factor.value = 2000
+rumble.keyTracking.factor.rampTo(  0.5,.5)
+
+rumble.setADSR(.5,10,.5,25)
+rumble.vca_lvl.value = .4
+rumble.setFilterADSR(.25,20,.3,10)
+
+rumble.setPwmDepth(.1,.0,.4)
+rumble.lfo.frequency.value = .01
+
+strip.setEQ(0,-2,0)
+strip.setEQBands(200,1000)
+strip.setSendLevel(.0)
+
+delay.setDelayTime(60/130/2)
+delay.setFeedback(0)
+delay.setCross(.02)
+delay.setPanning(1)
+delay.setLowpass(1000)
+*/
+
+/*
+setNoteOnHandler(( note, vel, channel ) => {
+  console.log("note",note,vel,channel)
+  if(channel == 1) rumble.triggerAttack(Tone.Midi(note).toFrequency(),Math.pow(vel/127,2)); 
+  else if(channel == 2) rumble.setADSR(.3, note/127 * 3,0,note/127 * 4)
+}) 
+setMidiInput(1)
+setNoteOffHandler(( note, vel, channel ) => {
+  if(channel == 1) rumble.triggerRelease(); 
+  else if(channel == 2) rumble.setADSR(.3, note/127 * 3,0,note/127 * 4)
+}) 
+setCCHandler(( num, val, channel ) => {
+}) 
+
+
+let scope = new Oscilloscope('Canvas2')
+strip.output.connect( scope.input)
+scope.gain.value = 1
+scope.threshold = .0
+
+setCCHandler(( num, val, channel ) => {
+  //console.log('cc', num, val, channel)
+  val = val/127
+  switch(num){
+    case lcxl.ch1.knob[0]: rumble.vco_gain_2.factor.value = Math.pow(val,2)/4; break;
+    case lcxl.ch1.knob[1]: rumble.vco_gain_3.factor.value = Math.pow(val,2)/4; break;
+    case lcxl.ch2.fader: strip.send.factor.value = Math.pow(val,2)*.1; break;
+    //vcf
+    case lcxl.ch2.knob[0]: rumble.cutoff.rampTo( Math.pow(val,2) *10000 + 20); break;
+    case lcxl.ch2.knob[1]: rumble.vcf_env_depth.factor.rampTo( Math.pow(val,2) *10000 + 20); break;
+    //case lcxl.ch2.knob[2]: rumble.keyTracking.factor.rampTo( Math.pow(val,2) *10000 + 20); break;
+    //adsr
+    case lcxl.ch2.knob[2]: rumble.setADSR(val<.5?.005 : val+.005,val*8,.5,val*20);break;
+    //case lcxl.ch3.knob[1]: rumble.setFilterADSR(val<.5?.005 : val/2+.005,val*4,0,val*10);break;
+    //delay
+    case lcxl.ch8.knob[2]: delay.setPanning(val*2); break;
+    case lcxl.ch5.knob[2]: delay.setFeedback(Math.pow(val,2)*1); break;
+    case lcxl.ch6.knob[2]: delay.setCross(Math.pow(val,2)*.5); break;
+    case lcxl.ch7.knob[2]: delay.setLowpass(Math.pow(val,2)*5000+100); break;
+    //mixer
+    case lcxl.ch1.fader: rumble.output.factor.rampTo( Math.pow(val,2)/2, .1)
+  }
+}) 
+
+console.log(strip.send.get())
+
+//buttons, device,mute,solo,arm are midi notes
+let lcxl = {
+  "ch1": {"knob": [13,29,49], "fader":77, "button":[41,73]},
+  "ch2": {"knob": [14,30,50], "fader":78, "button":[42,74]},
+  "ch3": {"knob": [15,31,51], "fader":79, "button":[43,75]},
+  "ch4": {"knob": [16,32,52], "fader":80, "button":[44,76]},
+  
+  "ch5": {"knob": [17,33,53], "fader":81, "button":[57,89]},
+  "ch6": {"knob": [18,34,54], "fader":82, "button":[58,90]},
+  "ch7": {"knob": [19,35,55], "fader":83, "button":[59,91]},
+  "ch8": {"knob": [20,36,56], "fader":84, "button":[60,92]},
+  "transport": {
+    "device": 105, 
+    "mute": 106, 
+    "solo": 107,
+    "arm": 108,
+    "up": 104,
+    "down": 105,
+    "left": 106,
+    "right": 107,
+  }
+}
+
+//pitch seq
+let scale = [0,2,3,5,7,8,10]
+let octave = 3
+let pitchSeq = (i,time)=>{
+  i = i%8%5 ? 12-i%16%5*2 : -1
+  if(i>=0) i = Tone.Midi(octave*12+scale[i%scale.length]).toFrequency()
+  if(i>=0) {
+    //console.log(i, scale[i%scale.length])
+    rumble.triggerAttackRelease(i,1,.1,time)
+  }
+}
+let index = 0
+
+//param seq
+let x =0
+let paramSeq = (i,time)=>{
+  x = (i+64)%128
+  console.log(x)
+  rumble.cutoff.value = Math.pow(x/128,3)*1200+200
+  x = Math.pow(i%128%14/12,1.5)+.2
+  rumble.setADSR(.01,x,0,x)
+  x = (i % 32)/32
+  rumble.setPwmDepth(x,x,x)
+  rumble.lfo.frequency.value = 4-(i%32)/12
+  rumble.vcf.Q.value = (i/16)%15
+}
+
+seq.stop()
+let seq = new Tone.Loop((time)=>{
+  pitchSeq(index,time)
+  paramSeq(index,time)
+  index = index+1
+},'16n').start()
+//
+Tone.Transport.start()
+*/
