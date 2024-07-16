@@ -4,7 +4,7 @@ Handles IMU input and sends MIDI data
 
 const byte IMU_DEBUG = 0; //enable to see data in arduino console
 const int IMU_DATA_RANGE = 10000; //the maximum accerlation value we are interested in
-
+const byte changeThreshold = 3;
 void imuSetup(){
   Wire.begin(44,43);
 
@@ -23,7 +23,9 @@ void imuLoop(){
   int readInterval = 5;
   static int32_t accel[] = {0,0,0};
   static int32_t gyro[] = {0,0,0};
+  static int32_t onepole[] = {0,0,0};
   static int count = 0;
+  static int prev_output[3] = {0,0,0};
 
   //every 5 milliseconds read the imu data
   // accumulate these readings
@@ -54,25 +56,37 @@ void imuLoop(){
     }
     else{
       //send each axis of acceleration independently
-      int val = imu.a.x;
-      if(val > IMU_DATA_RANGE) val = IMU_DATA_RANGE;
-      else if (val < -IMU_DATA_RANGE) val = -IMU_DATA_RANGE;
-      sendMidiCC(accelCCs[0], map(val, -IMU_DATA_RANGE, IMU_DATA_RANGE, 0, 127));
+      int32_t val[3] = {0,0,0};
+      for(int j=0;j<3;j++) {
+        val[j] = accel[j]/count;
+        val[j] = val[j]*.25 + onepole[j]*.75;
+        onepole[j] = val[j];
+      }
 
-      val = imu.a.y;
-      if(val > IMU_DATA_RANGE) val = IMU_DATA_RANGE;
-      else if (val < -IMU_DATA_RANGE) val = -IMU_DATA_RANGE;
-      sendMidiCC(accelCCs[1], map(val, -IMU_DATA_RANGE, IMU_DATA_RANGE, 0, 127));
+      int32_t output = 0;
+      if(output > IMU_DATA_RANGE) output = IMU_DATA_RANGE;
+      else if (output < -IMU_DATA_RANGE) output = -IMU_DATA_RANGE;
+      output = map(val[0], -IMU_DATA_RANGE, IMU_DATA_RANGE, 0, 127);
+      if(abs(output-prev_output[0])){
+        prev_output[0] = output;
+        sendMidiCC(accelCCs[0], (byte) output);
+      }
+      
+      if(output > IMU_DATA_RANGE) output = IMU_DATA_RANGE;
+      else if (output < -IMU_DATA_RANGE) output = -IMU_DATA_RANGE;
+      output = map(val[1], -IMU_DATA_RANGE, IMU_DATA_RANGE, 0, 127);
+      if(abs(output-prev_output[1])){
+        prev_output[1] = output;
+        sendMidiCC(accelCCs[1], (byte) output);
+      }
 
-      val = imu.a.z;
-      if(val > IMU_DATA_RANGE) val = IMU_DATA_RANGE;
-      else if (val < -IMU_DATA_RANGE) val = -IMU_DATA_RANGE;
-      sendMidiCC(accelCCs[2], map(val, -IMU_DATA_RANGE, IMU_DATA_RANGE, 0, 127));
-
-      //send the total magnitude of acceleration
-      val = sqrt(pow(imu.a.x,2) + pow(imu.a.y,2) + pow(imu.a.z,2));
-      if(val > IMU_DATA_RANGE) val = IMU_DATA_RANGE;
-      sendMidiCC(accelCCs[2], map(val, 0, IMU_DATA_RANGE, 0, 127));
+      if(output > IMU_DATA_RANGE) output = IMU_DATA_RANGE;
+      else if (output < -IMU_DATA_RANGE) output = -IMU_DATA_RANGE;
+      output = map(val[2], -IMU_DATA_RANGE, IMU_DATA_RANGE, 0, 127);
+      if(abs(output-prev_output[2])){
+        prev_output[2] = output;
+        sendMidiCC(accelCCs[2], (byte) output);
+      }
 
       for( int i=0;i<3;i++){
         accel[i] = 0;

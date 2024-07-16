@@ -25,7 +25,8 @@
   - Buttons:
     - Configured for four buttons connected to pins 3, 4, 5, and 7.
     - Button presses send MIDI note on messages, and releases send MIDI note off messages.
-    - Button note numbers are mapped to MIDI notes (48, 50, 53, 55).
+    - Button note numbers are mapped to MIDI notes {36,38,42,46}
+    - (kick,snare,closed hat, open hat)
 
   Additional Information:
   - Supports serial debugging. set SERIAL_DEBUG to 1 to enable debugging
@@ -54,7 +55,9 @@ uint8_t potCCs[] = {0,1,2,3};
 const byte numButtons = 4;
 //for buttons the argument is the pin number
 Button buttons[numButtons] = { Button(3), Button(4), Button(5), Button(7) };
-uint8_t buttonNoteNums[] = {48,50,53,55};
+uint8_t buttonNoteNums[] = {36,38,42,46};
+//keep track of when notes are triggered to temporarily mute IMU
+uint32_t noteTriggerTime = 0;
 
 // arguments are the pin numbers
 LED led(11,12,13);
@@ -77,7 +80,7 @@ void setup() {
 
 void loop() {
   // Handle MIDI input
-  imuLoop(); //handle IMU
+  if(millis() > noteTriggerTime + 10) imuLoop(); //handle IMU
   led.loop(); //handle LEDS
 
   //potentiometers
@@ -105,7 +108,10 @@ void loop() {
       if( buttons[i].isPressed()) Serial.println("Button " + String(i) + " pressed ");
       else if( buttons[i].isReleased()) Serial.println("Button " + String(i) + " released ");
     } else{
-      if( buttons[i].isPressed()) sendMidiNoteOn( buttonNoteNums[i], 127 );
+      if( buttons[i].isPressed()) {
+        sendMidiNoteOn( buttonNoteNums[i], 127 );
+        noteTriggerTime = millis();
+      }
       else if( buttons[i].isReleased()) sendMidiNoteOff( buttonNoteNums[i] );
     }
   }

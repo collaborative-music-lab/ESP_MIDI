@@ -10,7 +10,7 @@ class Button {
       this->pin = pin;
       pinMode(pin, INPUT_PULLUP); // Assuming a pull-up resistor configuration
       lastDebounceTime = 0;
-      debounceDelay = 20; // 50 ms debounce delay
+      debounceDelay = 50; // 50 ms debounce delay
       lastButtonState = HIGH;
     }
 
