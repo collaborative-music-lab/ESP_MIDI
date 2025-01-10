@@ -5,19 +5,20 @@
 #include <FastLED.h>
 
 // Number of LEDs and pin definition
-#define NUM_LEDS 2
-#define LED_PIN 13
+#define NUM_LEDS 3
+//#define LED_PIN 13
 //21 is built in LED
 
 // LED class abstraction
 class WS2812LED {
 private:
     int index;           // Index of the LED in the array
+    byte pin;
     static CRGB leds[];  // Shared FastLED array for all LEDs
 
 public:
     // Constructor
-    WS2812LED(int ledIndex) : index(ledIndex) {}
+    WS2812LED(int ledIndex, byte pin) : index(ledIndex), pin(pin) {}
 
     // Set color using RGB values
     void color(int r, int g, int b) {
@@ -33,7 +34,7 @@ public:
 
     // Static method to initialize FastLED
     static void begin() {
-        FastLED.addLeds<WS2811, LED_PIN, GRB>(leds, NUM_LEDS);
+        FastLED.addLeds<WS2811, pin, GRB>(leds, NUM_LEDS);
         FastLED.clear();
         FastLED.show();
     }

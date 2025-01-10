@@ -1,4 +1,4 @@
-21937355674089537
+21949506859751603
 Audio_Module
 Reverb_BTDR-1H
 Digital Reverberation Unit, http://www.belton.co.kr/inc/downfile.php?seq=17&file=pdf (footprint from http://www.uk-electronic.de/PDF/BTDR-1.pdf)
@@ -91021,12 +91021,33 @@ Based on female plug with cheap solder lugs
 4
 3
 ih_kicad
+potentiometer_wheel_10mm
+Potentiometer, vertical wheel
+Potentiometer vertical wheel audio
+0
+7
+6
+ih_kicad
+potentiometer_wheel_10mm_SMD-shield
+Potentiometer, vertical wheel SMD
+Potentiometer vertical wheel audio
+0
+7
+6
+ih_kicad
+potentiometer_wheel_10mm_SMD-shield-1pad
+Potentiometer, vertical wheel SMD
+Potentiometer vertical wheel audio
+0
+6
+6
+ih_kicad
 potentiometer_wheel_16mm
 Potentiometer, vertical, Omeg PC16BU, http://www.omeg.co.uk/pc6bubrc.htm
 Potentiometer vertical Omeg PC16BU
 0
-3
-3
+5
+5
 ih_kicad
 recorder-touchpad
 
@@ -91035,7 +91056,35 @@ recorder-touchpad
 1
 1
 ih_kicad
+recorder-touchpad-alt
+
+
+0
+1
+1
+ih_kicad
+recorder-touchpad-alt-up
+
+
+0
+1
+1
+ih_kicad
 recorder-touchpad-narrow
+
+
+0
+1
+1
+ih_kicad
+recorder-touchtrack
+
+
+0
+1
+1
+ih_kicad
+recorder-touchtrack_120mm
 
 
 0

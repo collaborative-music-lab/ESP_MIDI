@@ -1,8 +1,8 @@
 /*
   File Name: ESP32_MIDI.ino
-  Version: 1.0
+  Version: v3
   Creator: Ian Hattwick
-  Date: July 1, 2024
+  Date: Dec 28, 2024
 
   Description:
   This program allows an ESP32_S3 to act as a class compliant midi device.
@@ -11,22 +11,19 @@
   - in order to reprogram the board, you will need to hold down the buttons on the board
   - hold down the B (boot) button and tap the R (reset) button
   - Arduino should recognize the ESP32s3
+  - USB CDC on boot may need to be set to 'disabled'
   
   Input Signals:
-  - IMU (Inertial Measurement Unit): 
-    - Uses the LSM6 library to read acceleration data, mapped to MIDI CC messages (10, 11, 12, 13).
+  - capacitive touch pads. 8 for fingers, two alt pads, 
+  - two potentiometers
+  
+  Output Signals:
+  - two external LED outputs, TBD on pin 43 or 44
+  - onboard LED on pin 21
+  - MIDI out via USB
 
-  - Potentiometers:
-    - Configured for four potentiometers connected to pins 2, 9, 8, and 6.
-    - Includes options for pin number and for potentiometer ranges to be reversed.
-    - Potentiometer values are mapped to MIDI CC messages (0, 1, 2, 3).
-    - Potentiometer values also control the RGB LED colors.
-
-  - Buttons:
-    - Configured for four buttons connected to pins 3, 4, 5, and 7.
-    - Button presses send MIDI note on messages, and releases send MIDI note off messages.
-    - Button note numbers are mapped to MIDI notes {36,38,42,46}
-    - (kick,snare,closed hat, open hat)
+  Version notes:
+  - this version 
 
   Additional Information:
   - Supports serial debugging. set SERIAL_DEBUG to 1 to enable debugging
@@ -35,7 +32,17 @@
 
 #include "USB_MIDI.h"
 #include "potentiometer.h"
-#include "led.h"
+#include "controller.h"
+
+#include "parameters.h"
+#include <Preferences.h>
+Preferences preferences;
+ParameterObject parameters;
+
+#include <FastLED.h>
+CRGB leds[2]; // Array for LEDs on pin 13
+CRGB built_in[1]; // Array for LEDs on pin 21
+
 #include "capsense.h"
 
 const byte ENABLE_USB_MIDI = 1;
@@ -43,41 +50,34 @@ const byte SERIAL_DEBUG = 0;
 
 /************** DEFINE INPUTS ******************/
 
+
 const byte numPots = 1;
 //for potentiometers the first argument is the pin number, the second is a flag if the pot is reversed
 Potentiometer pots[numPots] =  {Potentiometer(11)};
 uint8_t potCCs[] = {2,1,2,3};
 
-// Pins for the sensors
-const int touchPins[10] = {8, 9, 10, 5, 4, 3, 2, 1, 7, 6};
 
-// Upper and lower thresholds
-const int UPPER_THRESHOLD = 300;
-const int LOWER_THRESHOLD = 100;
+enum InstrumentMode { MONOPHONIC, POLYPHONIC };
+InstrumentMode currentMode = MONOPHONIC;
 
-// Array of CapSense instances
-CapSense cap[] = {
-    CapSense(touchPins[0], 0, UPPER_THRESHOLD, LOWER_THRESHOLD),
-    CapSense(touchPins[1], 1, UPPER_THRESHOLD, LOWER_THRESHOLD),
-    CapSense(touchPins[2], 2, UPPER_THRESHOLD, LOWER_THRESHOLD),
-    CapSense(touchPins[3], 3, UPPER_THRESHOLD, LOWER_THRESHOLD),
-    CapSense(touchPins[4], 4, UPPER_THRESHOLD, LOWER_THRESHOLD),
-    CapSense(touchPins[5], 5, UPPER_THRESHOLD, LOWER_THRESHOLD),
-    CapSense(touchPins[6], 6, UPPER_THRESHOLD, LOWER_THRESHOLD),
-    CapSense(touchPins[7], 7, UPPER_THRESHOLD, LOWER_THRESHOLD),
-    CapSense(touchPins[8], 8, UPPER_THRESHOLD, LOWER_THRESHOLD),
-    CapSense(touchPins[9], 9, UPPER_THRESHOLD, LOWER_THRESHOLD)
-};
+void setMode(InstrumentMode mode) {
+    currentMode = mode;
+    //Serial.printf("Switched to %s mode\n", mode == MONOPHONIC ? "Monophonic" : "Polyphonic");
+}
 
-// Global FastLED array
-// Create LED objects for each LED
-WS2812LED led[] = { WS2812LED(0), WS2812LED(1) };
 
 /************** SETUP ******************/
 
 void setup() {
   //Serial.begin(115200);
   if( ENABLE_USB_MIDI) usbMidiSetup();
+
+  // Initialize Preferences
+    // preferences.begin("params", false); // Open namespace "params" for writing
+    // // Load parameters
+    // parameters.loadFromPreferences(preferences);
+    // // Close Preferences
+    // preferences.end();
   
   while (!Serial && millis() < 5000) {
     delay(10);
@@ -86,14 +86,36 @@ void setup() {
 
   touchSetCycles(10,5); //(uint16_t measure, uint16_t sleep);
 
-  WS2812LED::begin();
-  WS2812LED::brightness( 50 );
+  FastLED.addLeds<WS2811, 13, RGB>(leds, 2);
+  FastLED.addLeds<WS2811, 21, GRB>(built_in, 1);
+  FastLED.setBrightness(25);
 
   pinMode(43, INPUT_PULLUP);
   pinMode(44, INPUT_PULLUP);
 
-  //neopixelWrite(21 ,200,0,0); // Red
+  //setupFingeringToMidiNote();
+
 }//setup
+
+void handleNoteOn(uint8_t channel, uint8_t note, uint8_t velocity) {
+  //Serial.printf("Note On: Channel %d, Note %d, Velocity %d\n", channel + 1, note, velocity);
+  // Add your custom behavior for Note On here
+}
+
+void handleNoteOff(uint8_t channel, uint8_t note) {
+  //Serial.printf("Note Off: Channel %d, Note %d\n", channel + 1, note);
+  // Add your custom behavior for Note Off here
+}
+
+void handleControlChange(uint8_t channel, uint8_t number, uint8_t value) {
+  built_in[0] = CRGB(0, 0, 255);
+  FastLED.show();
+  if (number == 120 && value == 120) { // CC 120 triggers the parameter query
+        sendStoredParameters();
+        return;
+    } else updateParameterValue(channel, number, value);
+}
+
 
 /************** LOOP ******************/
 
@@ -102,9 +124,10 @@ int measureCycles = 100;   // Default measure cycles
 int sleepCycles = 20;      // Default sleep cycles
 
 void loop() {
-  if (Serial.available() > 0) {
-        parseSerialCommand();
-    }
+  // if (Serial.available() > 0) {
+  //       parseSerialCommand();
+  //   }
+  processIncomingMidi();
 
   // Handle MIDI input
   static uint32_t timer = 0;
@@ -117,48 +140,22 @@ void loop() {
       
       if( SERIAL_DEBUG ){
         if( currentSensor == i )  printVals(cap[i].getValue(), cap[i].getState());
-        // if (cap[i].getState()  ) {
-        //   Serial.print(cap[i].getValue());
-        //   Serial.print('\t');
-        // }
-        // else{
-        //   Serial.print(cap[i].getValue());
-        //   Serial.print('\t');
-        // }
       } 
       if(ENABLE_USB_MIDI){
         if( cap[i].state == true && cap[i].getChange() == true){
           sendMidiNoteOn( i, touchToMidi(cap[i].getValue()) );
-          led[0].color(100,100,100);
-          led[1].color(100,100,100);
+          leds[0] = CRGB(255, 0, 0);
+          leds[1] = CRGB(255, 0, 0);
         } else if( cap[i].state == false && cap[i].getChange() == true){
           sendMidiNoteOff( i );
-          led[0].color(200,100,255);
-          led[1].color(100,100,100);
+          leds[0] = CRGB(0, 255, 0);
+          leds[1] = CRGB(0, 255, 0);
+          built_in[0] = CRGB(0, 0, 0);
         }
-        WS2812LED::show();
+        FastLED.show();
       }
     }
-     if( SERIAL_DEBUG ) { Serial.println();
-
-     }
-
-     if(0){
-      byte fooPins[] = {43,44};
-      static byte foo[] = {0,0};
-      //led[0].color(200*digitalRead(43),100,255);
-      WS2812LED::show();
-      for(byte i=0;i<2;i++){
-        if(digitalRead(fooPins[i])){
-          if(foo[i]==0) sendMidiNoteOn( fooPins[i]-30, 127 );
-          foo[i]=1;
-        } else if(foo[i]==1){
-          sendMidiNoteOff( fooPins[i] );
-          foo[i]=0;
-        }
-      }
-     }
-  }
+  }//timer
   int val = map(touchRead(12),0,4095,0,127);
   val = val>127 ? 127 : val;
   sendMidiCC( 12, val);
@@ -185,7 +182,27 @@ void loop() {
         sendMidiCC( 0, constrain( map( cap[8].getValue(), 0,5000,0,127),0,127 ));
         sendMidiCC( 1, constrain( map( cap[9].getValue(), 0,5000,0,127),0,127 ));
       }
+}//loop
+
+void readTouchpads() {
+  for (int i = 0; i < 11; i++) {
+    cap[i].update();
+    if( cap[i].state == true && cap[i].getChange() == true){
+          if (currentMode == MONOPHONIC) {
+                handleMonophonicTouchpad(i, 1);
+            } else {
+                handlePolyphonicTouchpad(i, 1);
+            }
+        } else if( cap[i].state == false && cap[i].getChange() == true){
+          if (currentMode == MONOPHONIC) {
+                handleMonophonicTouchpad(i, 0);
+            } else {
+                handlePolyphonicTouchpad(i, 0);
+            }
+        }
+  }
 }
+
 
 void printVals(int raw, bool touch) {
     int scaledTouch = touch ? 1000 : 0;
@@ -251,3 +268,4 @@ uint8_t touchToMidi(int val){
   val = map(val, 0,4095, 0,127);
   return uint8_t(val>127 ? 127 : val);
 }
+
