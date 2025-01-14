@@ -47,23 +47,27 @@ CRGB built_in[1]; // Array for LEDs on pin 21
 
 #include "capsense.h"
 
-
-
+int monitorInput = -1;
 /************** DEFINE INPUTS ******************/
-
-
-const byte numPots = 2;
 //for potentiometers the first argument is the pin number, the second is a flag if the pot is reversed
-Potentiometer pots[numPots] =  {Potentiometer(11), Potentiometer(12)};
-uint8_t potCCs[] = {2,1,2,3};
+Potentiometer pots[] =  {Potentiometer(11), Potentiometer(12)};
 
 //(int ccNumber, int minInterval = 20, int inLow = 0, int inHigh = 127, int deltaThreshold = 2, float alpha = 0.2))
 CController cc[] = {
   CController(0, 50, 20, 4075, 3, .1), //pot1
   CController(1, 50, 20, 4075, 3, .1), //pot2
   CController(2, 20, 0, 2000, 10, .1), //touchbar
-  CController(3, 20, 0, 2000, 10, .1), //potCapsense1
-  CController(4, 20, 0, 2000, 10, .1)  //potCapsense2
+  CController(3, 20, 0, 5000, 10, .1), //potCapsense1
+  CController(4, 20, 0, 5000, 10, .1),  //potCapsense2
+  //afterTouch for pads 0-7
+  CController(10, 20, 0, 2000, 10, .1),
+  CController(11, 20, 0, 2000, 10, .1),
+  CController(12, 20, 0, 2000, 10, .1),
+  CController(13, 20, 0, 2000, 10, .1),
+  CController(14, 20, 0, 2000, 10, .1),
+  CController(15, 20, 0, 2000, 10, .1),
+  CController(16, 20, 0, 2000, 10, .1),
+  CController(17, 20, 0, 2000, 10, .1),
 };
 
 
@@ -118,12 +122,29 @@ void handleNoteOff(uint8_t channel, uint8_t note) {
 }
 
 void handleControlChange(uint8_t channel, uint8_t number, uint8_t value) {
-  built_in[0] = CRGB(0, 0, 255);
-  FastLED.show();
-  if (number == 120 && value == 120) { // CC 120 triggers the parameter query
-        sendStoredParameters();
-        return;
-    } else updateParameterValue(channel, number, value);
+  statusLed(1);
+  switch (number) {
+  case 127: monitorInput = -1; return;
+  case 100: case 101: case 102: case 103: case 104:
+  case 105:
+  case 106:
+  case 107:
+  case 108:
+  case 109:
+  case 110:
+  case 111:
+  case 112:
+    monitorInput = number - 100;
+    return;
+    // Optional: Handle cases not covered above
+   // monitorInput = null;
+}
+  // built_in[0] = CRGB(0, 0, 255);
+  // FastLED.show();
+  // if (number == 120 && value == 120) { // CC 120 triggers the parameter query
+  //       sendStoredParameters();
+  //       return;
+  //   } else updateParameterValue(channel, number, value);
 }
 
 
@@ -134,23 +155,30 @@ int measureCycles = 100;   // Default measure cycles
 int sleepCycles = 20;      // Default sleep cycles
 
 void loop() {
-  // if (Serial.available() > 0) {
-  //       parseSerialCommand();
-  //   }
-  //if( ENABLE_USB_MIDI) processIncomingMidi();
+  if( ENABLE_USB_MIDI) processIncomingMidi();
+  statusLed(0);
 
   // Handle MIDI input
   static uint32_t timer = 0;
-  int interval = 100; 
+  int interval = 5; 
 
   if(millis()-timer > interval){
     timer= millis();
+    if( monitorInput == 11){
+      sendMidiCC(11, constrain(analogRead(11)/10,0,127));
+      return;
+    } else if( monitorInput == 12){
+      sendMidiCC(12, constrain(analogRead(12)/10,0,127));
+      return;
+    }
+    
 
-    //static int tempPins[] = {8, 9, 10, 5, 4, 3, 2, 1, 7, 13, 6};
     for(int i=0;i<11;i++){
       cap[i].update();
-      //Serial.print(touchRead(tempPins[i]));
-      //Serial.print("\t");
+      if( monitorInput == i){
+        sendMidiCC(i, constrain(cap[i].raw/10,0,127));
+        return;
+      }
       
       if( SERIAL_DEBUG ){
         //if( currentSensor == i )  printVals(i, cap[i].getValue(), cap[i].getState());
@@ -170,7 +198,7 @@ void loop() {
         FastLED.show();
       }
     }
-    //Serial.println("\t");
+    //if( SERIAL_DEBUG ) Serial.println("\t");
     cc[0].send(analogRead(12));
     cc[1].send(analogRead(11));
     cc[2].send(cap[8].getValue());
@@ -269,3 +297,30 @@ uint8_t touchToMidi(int val){
   return uint8_t(val>127 ? 127 : val);
 }
 
+void statusLed(int num){
+  byte color[][3] = {
+    {100, 0, 0},   // Red
+    {0, 100, 0},   // Green
+    {0, 0, 100},   // Blue
+    {100, 0, 100}, // Magenta
+    {100, 100, 100} // White
+  };
+  static int state = 0;
+  if( state==0) return;
+  if( num==0 ) return;
+  static uint32_t timer = 0;
+  int interval = 63;
+  if(num>5) return;
+  if(millis()-timer>interval){
+    timer = millis();
+    if(state==1){
+      state = 2;
+      built_in[0] = CRGB(color[num-1][0], color[num-1][1], color[num-1][2]);
+      FastLED.show();
+    } else {
+      state = 0;
+      built_in[0] = CRGB(0, 0, 0);
+      FastLED.show();
+    }
+  }
+}

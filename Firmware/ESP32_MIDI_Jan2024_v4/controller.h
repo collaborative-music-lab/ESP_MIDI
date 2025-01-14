@@ -5,7 +5,6 @@ CC class for sending MIDI CC messages
 - large changes in CC value will be sent immmediately
 - otherwise, a lowpass filter with alphaFixed will smooth the CC value
 - call updateAlpha(float 0-1) to change the alpha.
-
 */
 
 class CController {
@@ -48,7 +47,9 @@ class CController {
           // if the new value is significantly different, send a message immediately
           int delta = abs(ccValue - lastCCValue);
           if( delta > deltaThreshold ){
-            sendMidiCC(ccNumber, ccValue); // Send the MIDI CC message
+            if(ENABLE_USB_MIDI) sendMidiCC(ccNumber, ccValue); // Send the MIDI CC message
+            else Serial.printf("CC: %d, %d, and %d\n", ccNumber, ccValue, delta);
+            
             lastCCValue = ccValue;        // Update the last sent value
             lastSendTime = millis();            // Update the last send time
             return;
