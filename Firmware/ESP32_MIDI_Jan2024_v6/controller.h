@@ -35,6 +35,10 @@ class CController {
 
       // Handle CC value sending
       void send(int val) {
+<<<<<<< HEAD
+=======
+          val = constrain(val,inLow, inHigh);
+>>>>>>> 349561fe86b8054989819bd4e417863e19d2b782
           int ccValue = map(val, inLow, inHigh, 0, 127);
           ccValue = constrain(ccValue, 0, 127);
 

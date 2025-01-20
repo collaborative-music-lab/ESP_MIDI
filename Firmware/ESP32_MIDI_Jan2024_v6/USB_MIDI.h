@@ -13,9 +13,6 @@ USBMIDI usbMIDI;
 #define MIDI_DEVICE_NAME "Creativitas Robin" 
 #define MIDI_MANUFACTURER_NAME "Ian Hattwick"
 
-#include <FastLED.h>
-extern CRGB leds[2];
-
 /** TinyUSB descriptors **/
 /*
 extern "C" uint16_t tusb_midi_load_descriptor(uint8_t *dst, uint8_t *itf) {
@@ -143,3 +140,4 @@ void processIncomingMidi() {
     }
   }
 }
+
