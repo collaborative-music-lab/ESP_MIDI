@@ -91,6 +91,7 @@ void sendMidiNoteOff(byte note) {
 }
 
 void sendMidiCC(uint8_t num, uint8_t val) {
+  usbMIDI.controlChange(num, val);
   // if (tud_midi_mounted()) {
   //   uint8_t cc[3] = {CC | channel, num, val};
   //   tud_midi_stream_write(cable_num, cc, 3);

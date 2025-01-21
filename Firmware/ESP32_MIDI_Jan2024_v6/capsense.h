@@ -1,9 +1,11 @@
+#include "esp32-hal.h"
 class CapSense {
   private:
     int pin;                // Pin number for the sensor
     int baseline;           // Baseline capacitance value
     int value;              // Current sensor reading
     int sensorNumber;       // Sensor ID for printing
+    uint32_t baselineTimer = 0;
     
 
   public:
@@ -12,6 +14,9 @@ class CapSense {
     bool change;
     int upperThreshold;     // Threshold for turning ON
     int lowerThreshold;     // Threshold for turning OFF
+    bool newNote = false;
+    byte velocity=0;
+
     // Constructor
     CapSense(int sensorPin, int sensorNum, int upperThresh, int lowerThresh)
         : pin(sensorPin), sensorNumber(sensorNum), upperThreshold(upperThresh), lowerThreshold(lowerThresh), state(false) {
@@ -20,44 +25,28 @@ class CapSense {
 
     // Update the sensor reading and evaluate state
     void update() {
-        raw = touchRead(pin); // Read the current value
+      raw = touchRead(pin); // Read the current value
 
-    //     Serial.print(sensorNumber);
-    // Serial.print(" ");
-    // Serial.print(pin);
-    // Serial.print(" ");
-    // Serial.print(raw);
-    // Serial.println(" ");      // Space separates multiple values (if added later)
-
-
+      if(millis()-baselineTimer > 100){
+        baselineTimer = millis();
         if(raw < baseline) baseline = raw;
         else baseline = baseline+1;
-        value = raw - baseline;
+      }
       
-        if (!state && value > upperThreshold) { // Transition to ON
-            state = true;
-            change = true;
-            // if( SERIAL_DEBUG ){
-            // Serial.print("Sensor ");
-            // Serial.print(sensorNumber);
-            // Serial.println(" ON");
-            // }
+      int prevValue = value;
+      value = raw - baseline;
 
-            // if(ENABLE_USB_MIDI){
-            //   sendMidiNoteOn( sensorNumber, 127 );
-            // }
-        } else if (state && value < lowerThreshold) { // Transition to OFF
-            state = false;
-            change = true;
-            // if( SERIAL_DEBUG ){
-            // Serial.print("Sensor ");
-            // Serial.print(sensorNumber);
-            // Serial.println(" OFF");
-            // }
-            // if(ENABLE_USB_MIDI){
-            //   sendMidiNoteOff( sensorNumber );
-            // }
-        }
+      if(prevValue-value > 0 && prevValue > upperThreshold && !state){
+        velocity = prevValue - upperThreshold;
+        newNote = true;
+        state= true;
+        change = true;
+      }
+    
+      else if (state && value < lowerThreshold) { // Transition to OFF
+          state = false;
+          change = true;
+      }
     }
 
     // Query the current state (on/off)
@@ -70,6 +59,13 @@ class CapSense {
         return true;
       }
       return false;
+    }
+    bool getNote(){
+      if(newNote) {
+        change = false;
+        return true;
+      }
+      else return false;
     }
 
     // Query the current sensor value
