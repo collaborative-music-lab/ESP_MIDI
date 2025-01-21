@@ -117,14 +117,37 @@ void setup() {
 
 }//setup
 
-void handleNoteOn(uint8_t channel, uint8_t note, uint8_t velocity) {
-  //Serial.printf("Note On: Channel %d, Note %d, Velocity %d\n", channel + 1, note, velocity);
-  // Add your custom behavior for Note On here
+
+void handleNoteOn(uint8_t channel, uint8_t note, uint8_t velocity) {  
+  byte color[][3] = {
+    {100, 0, 0},   // Red
+    {0, 100, 0},   // Green
+    {0, 0, 100},   // Blue
+    {100, 0, 100}, // Magenta
+    {100, 100, 100} // White
+  };
+  if (channel < 2) { //Use channels 1 and 2 to change color (velocity is brightness)
+    FastLED.setBrightness(velocity);
+    leds[channel] = CRGB(color[note % 5][0], color[note % 5][1], color[note % 5][2]);
+    FastLED.show();
+    Serial.printf("Note On: Channel %d, Note %d, Velocity %d\n", channel + 1, note, velocity);
+  }else if(channel < 4){ //Use channels 3 and 4 to flash a light
+    FastLED.setBrightness(velocity);
+    leds[channel-2] = CRGB(color[note % 5][0], color[note % 5][1], color[note % 5][2]);
+    FastLED.show();
+    delay(5);
+    leds[channel-2] = CRGB(0, 0, 0);
+    FastLED.show();
+  }
 }
 
 void handleNoteOff(uint8_t channel, uint8_t note) {
-  //Serial.printf("Note Off: Channel %d, Note %d\n", channel + 1, note);
-  // Add your custom behavior for Note Off here
+  if (channel < 2) {
+    leds[channel] = CRGB(0, 0, 0);
+    FastLED.show();
+    Serial.printf("Note Off: Channel %d, Note %d\n", channel + 1, note); 
+  }
+
 }
 
 void handleControlChange(uint8_t channel, uint8_t number, uint8_t value) {
@@ -182,14 +205,14 @@ void loop() {
       if(ENABLE_USB_MIDI){
         if( cap[i].state == true && cap[i].getChange() == true){
           sendMidiNoteOn( i, touchToMidi(cap[i].getValue()) );
-          leds[0] = CRGB(255, 0, 0);
-          leds[1] = CRGB(255, 0, 0);
+          // leds[0] = CRGB(255, 0, 0);
+          // leds[1] = CRGB(255, 0, 0);
           statusLed(2);
           FastLED.show();
         } else if( cap[i].state == false && cap[i].getChange() == true){
           sendMidiNoteOff( i );
-          leds[0] = CRGB(0, 255, 0);
-          leds[1] = CRGB(0, 255, 0);
+          // leds[0] = CRGB(0, 255, 0);
+          // leds[1] = CRGB(0, 255, 0);
           built_in[0] = CRGB(0, 0, 0);
           statusLed(2);
           FastLED.show();

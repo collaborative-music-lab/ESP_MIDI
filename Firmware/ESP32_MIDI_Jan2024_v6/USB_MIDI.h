@@ -96,47 +96,49 @@ void sendMidiCC(uint8_t num, uint8_t val) {
   //   uint8_t cc[3] = {CC | channel, num, val};
   //   tud_midi_stream_write(cable_num, cc, 3);
   // }
+  usbMIDI.controlChange(num, val, 1);
 }
 
 void processIncomingMidi() {
-  /*
-  uint8_t buffer[4]; // Buffer to hold raw MIDI packet data (4 bytes)
+  
 
-  while (tud_midi_available()) {
-    if (tud_midi_packet_read(buffer)) {
-      //led[0].color = [255,255,255];
-      USB_MIDI_t* packet = reinterpret_cast<USB_MIDI_t*>(buffer);
+  midiEventPacket_t midi_packet_in = {0, 0, 0, 0};
 
-      uint8_t status = packet->MIDI_0 & 0xF0; // Extract the message type
-      uint8_t channel = packet->MIDI_0 & 0x0F; // Extract the channel
-      uint8_t data1 = packet->MIDI_1;         // Note number or CC number
-      uint8_t data2 = packet->MIDI_2;         // Velocity or CC value
+  if (usbMIDI.readPacket(&midi_packet_in)) {
+    uint8_t cable_num = MIDI_EP_HEADER_CN_GET(midi_packet_in.header);
+    midi_code_index_number_t code_index_num = MIDI_EP_HEADER_CIN_GET(midi_packet_in.header);
 
-      // Call the external handlers
-      switch (status) {
-        case NOTE_ON:
-          if (data2 > 0) {
-            handleNoteOn(channel, data1, data2);
-          } else {
-            handleNoteOff(channel, data1);
-          }
-          break;
-
-        case NOTE_OFF:
-          handleNoteOff(channel, data1);
-          break;
-
-        case CC:
-          handleControlChange(channel, data1, data2);
-          break;
-
-        default:
-          // Handle other MIDI messages if needed
-          break;
+    switch (code_index_num) {
+      case MIDI_CIN_MISC:        Serial.println("This a Miscellaneous event"); break;
+      case MIDI_CIN_CABLE_EVENT: Serial.println("This a Cable event"); break;
+      case MIDI_CIN_SYSCOM_2BYTE:  // 2 byte system common message e.g MTC, SongSelect
+      case MIDI_CIN_SYSCOM_3BYTE:  // 3 byte system common message e.g SPP
+        Serial.println("This a System Common (SysCom) event");
+        break;
+      case MIDI_CIN_SYSEX_START:      // SysEx starts or continue
+      case MIDI_CIN_SYSEX_END_1BYTE:  // SysEx ends with 1 data, or 1 byte system common message
+      case MIDI_CIN_SYSEX_END_2BYTE:  // SysEx ends with 2 data
+      case MIDI_CIN_SYSEX_END_3BYTE:  // SysEx ends with 3 data
+        Serial.println("This a system exclusive (SysEx) event");
+        break;
+      case MIDI_CIN_NOTE_ON:{
+        handleNoteOn(midi_packet_in.byte1 & 0x0F, midi_packet_in.byte2, midi_packet_in.byte3);
+        break;
       }
+      case MIDI_CIN_NOTE_OFF:       
+        handleNoteOff(midi_packet_in.byte1 & 0x0F, midi_packet_in.byte2);
+        break;
+      case MIDI_CIN_POLY_KEYPRESS: Serial.printf("This a Poly Aftertouch event for Note %d and Value %d\n", midi_packet_in.byte2, midi_packet_in.byte3); break;
+      case MIDI_CIN_CONTROL_CHANGE:
+        handleControlChange(midi_packet_in.byte1 & 0x0F, midi_packet_in.byte2, midi_packet_in.byte3);
+        break;
+      case MIDI_CIN_PROGRAM_CHANGE:   Serial.printf("This a Program Change event with a Value of %d\n", midi_packet_in.byte2); break;
+      case MIDI_CIN_CHANNEL_PRESSURE: Serial.printf("This a Channel Pressure event with a Value of %d\n", midi_packet_in.byte2); break;
+      case MIDI_CIN_PITCH_BEND_CHANGE:
+        Serial.printf("This a Pitch Bend Change event with a Value of %d\n", ((uint16_t)midi_packet_in.byte2) << 7 | midi_packet_in.byte3);
+        break;
+      case MIDI_CIN_1BYTE_DATA: Serial.printf("This an embedded Serial MIDI event byte with Value %X\n", midi_packet_in.byte1); break;
     }
-    //led[0].color = [0,0,0];
   }
-  */
 }
 
