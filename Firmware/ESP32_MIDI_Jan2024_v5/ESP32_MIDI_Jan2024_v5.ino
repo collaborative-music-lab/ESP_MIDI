@@ -70,6 +70,8 @@ CController cc[] = {
   CController(17, 20, 0, 2000, 10, .1),
 };
 
+int velocityDepth = 200;
+
 
 enum InstrumentMode { MONOPHONIC, POLYPHONIC };
 InstrumentMode currentMode = MONOPHONIC;
@@ -83,6 +85,14 @@ void setMode(InstrumentMode mode) {
 /************** SETUP ******************/
 
 void setup() {
+  FastLED.addLeds<WS2811, 43, RGB>(leds, 2);
+  FastLED.addLeds<WS2811, 21, GRB>(built_in, 1);
+  FastLED.setBrightness(25);
+  leds[0] = CRGB(20, 0, 0);
+  leds[1] = CRGB(0, 0, 20);
+  built_in[0] = CRGB(0, 0, 20);
+  FastLED.show();
+
   if( ENABLE_USB_MIDI) usbMidiSetup();
   else Serial.begin(115200);
 
@@ -100,13 +110,6 @@ void setup() {
 
   touchSetCycles(10,5); //(uint16_t measure, uint16_t sleep);
 
-  FastLED.addLeds<WS2811, 43, RGB>(leds, 2);
-  FastLED.addLeds<WS2811, 21, GRB>(built_in, 1);
-  FastLED.setBrightness(25);
-  leds[0] = CRGB(20, 0, 0);
-  leds[1] = CRGB(0, 0, 20);
-  FastLED.show();
-
   //setupFingeringToMidiNote();
 
 }//setup
@@ -123,24 +126,13 @@ void handleNoteOff(uint8_t channel, uint8_t note) {
 
 void handleControlChange(uint8_t channel, uint8_t number, uint8_t value) {
   statusLed(1);
-  switch (number) {
-  case 127: monitorInput = -1; return;
-  case 100: case 101: case 102: case 103: case 104:
-  case 105:
-  case 106:
-  case 107:
-  case 108:
-  case 109:
-  case 110:
-  case 111:
-  case 112:
-    monitorInput = number - 100;
-    return;
-    // Optional: Handle cases not covered above
-   // monitorInput = null;
-}
-  // built_in[0] = CRGB(0, 0, 255);
-  // FastLED.show();
+  if( number == 127) {monitorInput = -1; return;} //disable all monitoring
+  else if( number >=80 && number<100){ monitorInput = number - 80; return;} //monitor raw data
+  else if( number >=60 && number<80){ cap[number-60].upperThreshold = value*20; return;} //update high threshold
+  else if( number >=40 && number<60){ cap[number-40].lowerThreshold = value*20;} //update low threshold
+  else if( number >=20 && number<40){ cap[number-20].upperThreshold = value*20;} //update velocity depth
+  //else if( number >=0 && number<20){ monitorInput = number - 80; return;}
+  // 
   // if (number == 120 && value == 120) { // CC 120 triggers the parameter query
   //       sendStoredParameters();
   //       return;
@@ -189,13 +181,17 @@ void loop() {
           sendMidiNoteOn( i, touchToMidi(cap[i].getValue()) );
           leds[0] = CRGB(255, 0, 0);
           leds[1] = CRGB(255, 0, 0);
+          statusLed(2);
+          FastLED.show();
         } else if( cap[i].state == false && cap[i].getChange() == true){
           sendMidiNoteOff( i );
           leds[0] = CRGB(0, 255, 0);
           leds[1] = CRGB(0, 255, 0);
           built_in[0] = CRGB(0, 0, 0);
+          statusLed(2);
+          FastLED.show();
         }
-        FastLED.show();
+        
       }
     }
     //if( SERIAL_DEBUG ) Serial.println("\t");
@@ -293,8 +289,12 @@ void parseSerialCommand() {
 }
 
 uint8_t touchToMidi(int val){
-  val = map(val, 0,4095, 0,127);
-  return uint8_t(val>127 ? 127 : val);
+  int min = velocityDepth;
+  int max = 2000-velocityDepth;
+  if(min>max) min = max;
+  val = constrain(val,min,max);
+  val = map(val, min,max, 0,127);
+  return uint8_t(constrain(val,0,127));
 }
 
 void statusLed(int num){
@@ -306,21 +306,26 @@ void statusLed(int num){
     {100, 100, 100} // White
   };
   static int state = 0;
-  if( state==0) return;
-  if( num==0 ) return;
   static uint32_t timer = 0;
   int interval = 63;
+  if( num==0){
+    if(state>0){
+      if(millis()-timer > interval){
+        state = 0;
+        built_in[0] = CRGB(0, 0, 0);
+        FastLED.show();
+      }
+      return;
+    } else return;
+  } 
+
   if(num>5) return;
-  if(millis()-timer>interval){
-    timer = millis();
-    if(state==1){
-      state = 2;
-      built_in[0] = CRGB(color[num-1][0], color[num-1][1], color[num-1][2]);
-      FastLED.show();
-    } else {
-      state = 0;
-      built_in[0] = CRGB(0, 0, 0);
-      FastLED.show();
-    }
-  }
+
+  //flash led
+  timer = millis();
+  state=1;
+  built_in[0] = CRGB(color[num-1][0], color[num-1][1], color[num-1][2]);
+  FastLED.show();
+
+  
 }

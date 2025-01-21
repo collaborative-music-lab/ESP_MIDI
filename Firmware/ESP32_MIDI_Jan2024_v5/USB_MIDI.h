@@ -9,17 +9,31 @@ You will never need to modify this file.
 #include "esp32-hal-tinyusb.h"
 
 static const char *TAG = "usbdmidi";
+const char* custom_device_name = "Creativitas Robin";
+const char* custom_manufacturer_name = "Ian Hattwick";
 
 /** TinyUSB descriptors **/
 extern "C" uint16_t tusb_midi_load_descriptor(uint8_t *dst, uint8_t *itf) {
-  uint8_t str_index = tinyusb_add_string_descriptor("TinyUSB MIDI");
-  uint8_t ep_num = tinyusb_get_free_duplex_endpoint();
-  TU_VERIFY(ep_num != 0);
-  uint8_t descriptor[TUD_MIDI_DESC_LEN] = {
-      TUD_MIDI_DESCRIPTOR(*itf, str_index, ep_num, (uint8_t)(0x80 | ep_num), 64)};
-  *itf += 1;
-  memcpy(dst, descriptor, TUD_MIDI_DESC_LEN);
-  return TUD_MIDI_DESC_LEN;
+    // Add custom string descriptors
+    //uint8_t manufacturer_index = tinyusb_add_string_descriptor(custom_manufacturer_name);
+    //uint8_t product_index = tinyusb_add_string_descriptor(custom_device_name);
+
+    // Get a free duplex endpoint for MIDI
+    uint8_t ep_num = tinyusb_get_free_duplex_endpoint();
+    TU_VERIFY(ep_num != 0);
+
+    // Create the MIDI descriptor with custom manufacturer and product indices
+    // uint8_t descriptor[TUD_MIDI_DESC_LEN] = {
+    //     TUD_MIDI_DESCRIPTOR(*itf, product_index, ep_num, (uint8_t)(0x80 | ep_num), 64)};
+    uint8_t descriptor[TUD_MIDI_DESC_LEN] = {
+    TUD_MIDI_DESCRIPTOR(*itf, 1, ep_num, (uint8_t)(0x80 | ep_num), 64)
+};
+    
+    *itf += 1;
+
+    // Copy the descriptor into the destination buffer
+    memcpy(dst, descriptor, TUD_MIDI_DESC_LEN);
+    return TUD_MIDI_DESC_LEN;
 }
 
 // From usb.org MIDI 1.0 specification. This 4 byte structure is the unit
@@ -37,7 +51,6 @@ typedef struct __attribute__((__packed__)) {
 #define NOTE_ON 0x90
 #define CC 0xB0
 
-
 static uint8_t const cable_num = 0; // MIDI jack associated with USB endpoint
 static uint8_t const channel = 0;   // 0 for channel 1
 static uint32_t note_pos = 0;
@@ -50,6 +63,7 @@ extern void handleNoteOff(uint8_t channel, uint8_t note);
 extern void handleControlChange(uint8_t channel, uint8_t number, uint8_t value);
 
 void usbMidiSetup(){
+  
   tinyusb_enable_interface(USB_INTERFACE_MIDI, TUD_MIDI_DESC_LEN, tusb_midi_load_descriptor);
   USB.begin();
 }

@@ -20,3 +20,10 @@ PCB/Kicad/Main-PCB/ESP32_MIDI_v2/Pot-adaptor/.DS_Store
 PCB/Kicad/Main-PCB/ESP32_MIDI_v2/Pot-adaptor/Gerber.zip
 PCB/Kicad/Pot-adaptor/.DS_Store
 PCB/Pot-adaptor/.DS_Store
+**/.svd
+**/.bin
+**/.cfg
+**/.elf
+**/.zip
+**/.lck
+**/.DS_Store
