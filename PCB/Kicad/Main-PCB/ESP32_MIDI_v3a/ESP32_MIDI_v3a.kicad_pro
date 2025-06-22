@@ -519,7 +519,7 @@
       "gencad": "",
       "idf": "",
       "netlist": "",
-      "plot": "",
+      "plot": "gerber-robin/",
       "pos_files": "",
       "specctra_dsn": "",
       "step": "ESP32_MIDI.step",

@@ -67,6 +67,12 @@
     "visible_layers": "ffdf5f2_ffffffff",
     "zone_display_mode": 0
   },
+  "git": {
+    "repo_password": "",
+    "repo_type": "",
+    "repo_username": "",
+    "ssh_key": ""
+  },
   "meta": {
     "filename": "ESP32_MIDI_v3.kicad_pro.kicad_prl",
     "version": 3
