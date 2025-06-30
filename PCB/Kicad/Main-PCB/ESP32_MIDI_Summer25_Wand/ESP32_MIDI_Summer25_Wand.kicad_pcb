@@ -422,7 +422,7 @@
 		(descr "5-pin TSOT23 package, http://cds.linear.com/docs/en/packaging/SOT_5_05-08-1635.pdf")
 		(tags "TSOT-23-5 Hand-soldering")
 		(property "Reference" "U1"
-			(at 0 -2.45 360)
+			(at 0 -2.45 0)
 			(layer "F.SilkS")
 			(uuid "c3b67206-d523-456c-8bae-703144b2959f")
 			(effects
@@ -433,7 +433,7 @@
 			)
 		)
 		(property "Value" "74AHCT1G125"
-			(at 0 2.5 360)
+			(at 0 2.5 0)
 			(layer "F.Fab")
 			(uuid "a6a4c992-14f0-4c29-901d-f292b86232e5")
 			(effects
@@ -5200,7 +5200,7 @@
 		(descr "C, Disc series, Radial, pin pitch=5.00mm, , diameter*width=5.1*3.2mm^2, Capacitor, http://www.vishay.com/docs/45233/krseries.pdf")
 		(tags "C Disc series Radial pin pitch 5.00mm  diameter 5.1mm width 3.2mm Capacitor")
 		(property "Reference" "C1"
-			(at 2.5 0 360)
+			(at 2.5 0 0)
 			(layer "F.SilkS")
 			(uuid "3c2b3d32-6cfb-4d69-a39b-d41c6280e93b")
 			(effects
@@ -5211,7 +5211,7 @@
 			)
 		)
 		(property "Value" "0.1uF"
-			(at 2.5 2.85 360)
+			(at 2.5 2.85 0)
 			(layer "F.Fab")
 			(uuid "4935ede9-dc09-421c-b18c-d41ff42fd601")
 			(effects
@@ -5406,7 +5406,7 @@
 			(uuid "97f4741f-1e51-4d0f-8fed-63d1e7bdd1d1")
 		)
 		(fp_text user "${REFERENCE}"
-			(at 2.5 0 360)
+			(at 2.5 0 0)
 			(layer "F.Fab")
 			(uuid "aff4aed0-2fcb-460b-a5de-d52e1a1c7e86")
 			(effects
@@ -6283,6 +6283,17 @@
 				(xyz 0 0 0)
 			)
 		)
+		(model "/Users/ianhattwick/MIT Dropbox/Ian Hattwick/_documents/kicad/libraries/keyswitch_model-master/mx/silent_alpaca/KiCad/silent_alpaca.step"
+			(offset
+				(xyz -2.5 -5 0)
+			)
+			(scale
+				(xyz 1 1 1)
+			)
+			(rotate
+				(xyz 0 0 0)
+			)
+		)
 	)
 	(footprint "Button_Switch_Keyboard:SW_Cherry_MX_1.00u_PCB"
 		(layer "B.Cu")
@@ -6578,6 +6589,17 @@
 		(model "${KICAD8_3DMODEL_DIR}/Button_Switch_Keyboard.3dshapes/SW_Cherry_MX_1.00u_PCB.wrl"
 			(offset
 				(xyz 0 0 0)
+			)
+			(scale
+				(xyz 1 1 1)
+			)
+			(rotate
+				(xyz 0 0 0)
+			)
+		)
+		(model "/Users/ianhattwick/MIT Dropbox/Ian Hattwick/_documents/kicad/libraries/keyswitch_model-master/mx/silent_alpaca/KiCad/silent_alpaca.step"
+			(offset
+				(xyz -2.5 -5 0)
 			)
 			(scale
 				(xyz 1 1 1)
@@ -6889,6 +6911,17 @@
 				(xyz 0 0 0)
 			)
 		)
+		(model "/Users/ianhattwick/MIT Dropbox/Ian Hattwick/_documents/kicad/libraries/keyswitch_model-master/mx/silent_alpaca/KiCad/silent_alpaca.step"
+			(offset
+				(xyz -2.5 -5 0)
+			)
+			(scale
+				(xyz 1 1 1)
+			)
+			(rotate
+				(xyz 0 0 0)
+			)
+		)
 	)
 	(footprint "Button_Switch_Keyboard:SW_Cherry_MX_1.00u_PCB"
 		(layer "B.Cu")
@@ -7184,6 +7217,17 @@
 		(model "${KICAD8_3DMODEL_DIR}/Button_Switch_Keyboard.3dshapes/SW_Cherry_MX_1.00u_PCB.wrl"
 			(offset
 				(xyz 0 0 0)
+			)
+			(scale
+				(xyz 1 1 1)
+			)
+			(rotate
+				(xyz 0 0 0)
+			)
+		)
+		(model "/Users/ianhattwick/MIT Dropbox/Ian Hattwick/_documents/kicad/libraries/keyswitch_model-master/mx/silent_alpaca/KiCad/silent_alpaca.step"
+			(offset
+				(xyz -2.5 -5 0)
 			)
 			(scale
 				(xyz 1 1 1)
@@ -7635,6 +7679,138 @@
 			)
 			(justify left bottom)
 		)
+	)
+	(dimension
+		(type aligned)
+		(layer "User.1")
+		(uuid "599c5466-f506-4321-abd5-096bfe801123")
+		(pts
+			(xy 280 84) (xy 174 84)
+		)
+		(height 9)
+		(gr_text "106.0000 mm"
+			(at 227 73.85 0)
+			(layer "User.1")
+			(uuid "599c5466-f506-4321-abd5-096bfe801123")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
+		(format
+			(prefix "")
+			(suffix "")
+			(units 3)
+			(units_format 1)
+			(precision 4)
+		)
+		(style
+			(thickness 0.15)
+			(arrow_length 1.27)
+			(text_position_mode 0)
+			(extension_height 0.58642)
+			(extension_offset 0.5) keep_text_aligned)
+	)
+	(dimension
+		(type aligned)
+		(layer "User.1")
+		(uuid "790c8cf1-2871-49b2-8e0c-cafa91bcabaa")
+		(pts
+			(xy 34 94) (xy 164 94)
+		)
+		(height -8.5)
+		(gr_text "130.0000 mm"
+			(at 99 84.35 0)
+			(layer "User.1")
+			(uuid "790c8cf1-2871-49b2-8e0c-cafa91bcabaa")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
+		(format
+			(prefix "")
+			(suffix "")
+			(units 3)
+			(units_format 1)
+			(precision 4)
+		)
+		(style
+			(thickness 0.15)
+			(arrow_length 1.27)
+			(text_position_mode 0)
+			(extension_height 0.58642)
+			(extension_offset 0.5) keep_text_aligned)
+	)
+	(dimension
+		(type aligned)
+		(layer "User.1")
+		(uuid "9be3db64-4c23-49db-8f15-199507cbd2e7")
+		(pts
+			(xy 34 94) (xy 34 106)
+		)
+		(height 5.5)
+		(gr_text "12.0000 mm"
+			(at 27.35 100 90)
+			(layer "User.1")
+			(uuid "9be3db64-4c23-49db-8f15-199507cbd2e7")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
+		(format
+			(prefix "")
+			(suffix "")
+			(units 3)
+			(units_format 1)
+			(precision 4)
+		)
+		(style
+			(thickness 0.15)
+			(arrow_length 1.27)
+			(text_position_mode 0)
+			(extension_height 0.58642)
+			(extension_offset 0.5) keep_text_aligned)
+	)
+	(dimension
+		(type aligned)
+		(layer "User.1")
+		(uuid "d5b46e16-1f4e-4963-95c8-0c3c917b3c80")
+		(pts
+			(xy 280 84) (xy 280 114)
+		)
+		(height -12.5)
+		(gr_text "30.0000 mm"
+			(at 291.35 99 90)
+			(layer "User.1")
+			(uuid "d5b46e16-1f4e-4963-95c8-0c3c917b3c80")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
+		(format
+			(prefix "")
+			(suffix "")
+			(units 3)
+			(units_format 1)
+			(precision 4)
+		)
+		(style
+			(thickness 0.15)
+			(arrow_length 1.27)
+			(text_position_mode 0)
+			(extension_height 0.58642)
+			(extension_offset 0.5) keep_text_aligned)
 	)
 	(segment
 		(start 221.863604 98)
