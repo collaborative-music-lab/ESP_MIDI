@@ -519,7 +519,7 @@
       "gencad": "",
       "idf": "",
       "netlist": "",
-      "plot": "gerber/",
+      "plot": "gerber-strip/",
       "pos_files": "",
       "specctra_dsn": "",
       "step": "ESP32_MIDI_WAND.step",

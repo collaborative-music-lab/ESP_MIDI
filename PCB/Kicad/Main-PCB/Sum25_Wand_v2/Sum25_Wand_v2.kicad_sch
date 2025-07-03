@@ -3604,7 +3604,7 @@
 		)
 		(uuid "fe0b1ca6-1137-44cf-992a-7f6039b4aca4")
 	)
-	(text "V2 fixes\n- swap order of IMU pins\n- holes for support pins of potentiometers\n- - tighten holes for mx pins\n- resistors and capacitors on switch side of PCB"
+	(text "V2 fixes\n+ swap order of IMU pins\n+ holes for support pins of potentiometers\n+ tighten holes for mx pins\n+ resistors and capacitors on switch side of PCB"
 		(exclude_from_sim no)
 		(at 22.098 122.682 0)
 		(effects
@@ -3668,7 +3668,7 @@
 		)
 		(uuid "18d95d7d-0e11-4654-84d3-96d9894086c5")
 	)
-	(label "A1"
+	(label "A0"
 		(at 171.45 44.45 0)
 		(fields_autoplaced yes)
 		(effects
@@ -3701,7 +3701,7 @@
 		)
 		(uuid "3414392c-1b5d-4484-839f-3e57810ab075")
 	)
-	(label "D0"
+	(label "A3"
 		(at 24.13 27.94 0)
 		(fields_autoplaced yes)
 		(effects
@@ -3866,7 +3866,7 @@
 		)
 		(uuid "ef342b2e-c507-466a-a46b-3c4ea17157f0")
 	)
-	(label "A0"
+	(label "A1"
 		(at 171.45 25.4 0)
 		(fields_autoplaced yes)
 		(effects
@@ -5289,7 +5289,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Button_Switch_Keyboard:SW_Cherry_MX_1.00u_PCB"
+		(property "Footprint" "Button_Switch_Keyboard:SW_Cherry_MX_1.00u_Plate"
 			(at 231.14 85.09 0)
 			(effects
 				(font
@@ -5428,7 +5428,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Button_Switch_Keyboard:SW_Cherry_MX_1.00u_PCB"
+		(property "Footprint" "Button_Switch_Keyboard:SW_Cherry_MX_1.00u_Plate"
 			(at 231.14 53.34 0)
 			(effects
 				(font
@@ -5695,7 +5695,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Button_Switch_Keyboard:SW_Cherry_MX_1.00u_PCB"
+		(property "Footprint" "Button_Switch_Keyboard:SW_Cherry_MX_1.00u_Plate"
 			(at 231.14 63.5 0)
 			(effects
 				(font
@@ -6037,7 +6037,7 @@
 				)
 			)
 		)
-		(property "Footprint" "ih_kicad:potentiometer_wheel_10mm_SMD-shield"
+		(property "Footprint" "ih_kicad:potentiometer_wheel_10mm"
 			(at 182.88 48.895 0)
 			(effects
 				(font
@@ -6464,7 +6464,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Button_Switch_Keyboard:SW_Cherry_MX_1.00u_PCB"
+		(property "Footprint" "Button_Switch_Keyboard:SW_Cherry_MX_1.00u_Plate"
 			(at 231.14 73.66 0)
 			(effects
 				(font
@@ -6602,7 +6602,7 @@
 				)
 			)
 		)
-		(property "Footprint" "ih_kicad:potentiometer_wheel_10mm_SMD-shield"
+		(property "Footprint" "ih_kicad:potentiometer_wheel_10mm"
 			(at 182.88 29.845 0)
 			(effects
 				(font
