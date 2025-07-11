@@ -40,26 +40,19 @@ bool startup_leds = true;
 
 //#include "capsense.h"
 
- m370_MPR121 mpr121(44,43); //SDA,SCL
-
-
-// const byte NUM_CAP = 12; //up to 12 sensors
-// m370_cap cap(NUM_CAP, 50); //number of capsensors, sampling rate (Hz)
+ m370_MPR121 mpr121(43,44); //SDA,SCL
 
 
 int monitorInput = -1;
 /************** DEFINE INPUTS ******************/
-//for potentiometers the first argument is the pin number, the second is a flag if the pot is reversed
-Potentiometer pots[] =  {Potentiometer(11)};
-
 //(int ccNumber, int minInterval = 20, int inLow = 0, int inHigh = 127, int deltaThreshold = 2, float alpha = 0.2))
 CController cc[] = {
-  CController(0, 50, 0, 1900, 3, .5), //hall1
-  CController(1, 50, 1900, 3550, 3, .5), //hall2
-  CController(2, 100, 100, 3900, 10, .4), //pot1
-  CController(3, 100, 100, 3900, 10, .4), //pot2
-  CController(4, 100, 20, 400, 10, .4),  //Capsense1
-  CController(5, 100, 20, 400, 10, .4), //Capsense2
+  CController(0, 50, 0, 4095, 5, .3), //hall1
+  CController(1, 50, 0, 4095, 5, .3), //hall2
+  CController(2, 100, 10, 4000, 4, .2), //pot1
+  CController(3, 100, 10, 4000, 4, .2), //pot2
+  CController(4, 100, 20, 400, 10, .2),  //Capsense1
+  CController(5, 100, 20, 400, 10, .2), //Capsense2
 
   //MPR121 cc[6] to cc[17]
   CController(10, 50, 0, 2000, 10, .2),
@@ -105,6 +98,7 @@ void setup() {
     delay(10);
   }
   if( ENABLE_USB_MIDI != 1) Serial.println("USB MIDI not enabled");
+  esp_log_level_set("*", ESP_LOG_NONE);  // Suppress all component logs
 
   touchSetCycles(5,10); //(uint16_t measure, uint16_t sleep);
 
@@ -179,6 +173,13 @@ void loop() {
   int interval = 50; 
   static byte prevValue[] = {0,0,0,0,0};
 
+  static int hallEffectRange[2][2] = {
+    {4000,0}, {4000,0}
+  };
+  int hallVal[2];
+  hallVal[0] = analogRead(2);
+  hallVal[1] = analogRead(9);
+
   if(0){
     Serial.print( touchRead(4) );
     Serial.print( "\t" );
@@ -191,15 +192,25 @@ void loop() {
   if(millis()-timer > interval){
     timer= millis();
 
+    for(byte i=0;i<2;i++){
+      if(hallVal[i] < hallEffectRange[i][0]){
+        hallEffectRange[i][0] = hallVal[i];
+      } else if(hallVal[i] > hallEffectRange[i][1]){
+        hallEffectRange[i][1] = hallVal[i];
+      }
+      hallVal[i]  = map(hallVal[i], hallEffectRange[i][0], hallEffectRange[i][1], 0, 4095);
+          //ccValue = constrain(ccValue, 0, 511);
+    }
+
     //cc[0].send(analogRead(12));
-    cc[0].send(analogRead(2)); //12    2
-    cc[1].send(analogRead(9)); // 5     9
+    cc[0].send(hallVal[0]); //12    2
+    cc[1].send(hallVal[1]); // 5     9
     cc[2].send(analogRead(10)); //11    3
     cc[3].send(analogRead(8)); //10    4
     cc[4].send(touchRead(11)/10); //4       10
     cc[5].send(touchRead(7)/10); //7       7
 
-    //readCap();
+    readCap();
   }
 
   //     if(ENABLE_USB_MIDI){
@@ -234,15 +245,43 @@ void loop() {
 }//loop
 
 void readCap(){
+  static byte lastTouchStatus = 0;
+  uint16_t touchStatus = mpr121.touched();
+
+  for (uint8_t i = 0; i < 12; i++) {
+    bool wasTouched = lastTouchStatus & (1 << i);
+    bool isTouched  = touchStatus     & (1 << i);
+    lastTouchStatus = touchStatus;
+
+    if (!wasTouched && isTouched) {
+      // Touched: 0 → 1
+      sendTouch(i, 1);
+    } else if (wasTouched && !isTouched) {
+      // Released: 1 → 0
+      sendTouch(i, 0);
+    }
+  }
   //cc[6] to cc[17]
-        for(int i=0;i<12;i++){
-          int filtered = mpr121.baselineData(i) - mpr121.filteredData(i);
-          //int filtered =  mpr121.filteredData(i);
-          //cc[i+10].send(filtered);
-          Serial.print(filtered);
-          Serial.print("\t");
-        }
-        Serial.println();
+        // for(int i=0;i<12;i++){
+        //   int filtered = mpr121.baselineData(i) - mpr121.filteredData(i);
+        //   //int filtered =  mpr121.filteredData(i);
+        //   //cc[i+10].send(filtered);
+        //   Serial.print(filtered);
+        //   Serial.print("\t");
+        // }
+        // Serial.println();
+}
+
+void sendTouch(byte num, byte val){
+  const byte midiNotes[] = {48,50,52,53,55,57,59,60,62,64,65,67,69,71,72};
+  if(SERIAL_DEBUG){
+    Serial.print("touch ");
+    Serial.print(num);
+    Serial.print("\t");
+    Serial.println(val);
+  } else{
+    sendMidiNoteOn(midiNotes[num], val*127);
+  }
 }
 
 // Function to parse serial input commands
