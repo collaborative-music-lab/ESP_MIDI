@@ -9,6 +9,36 @@ You will never need to modify this file.
 #include "USBMIDI.h"
 USBMIDI usbMIDI;
 
+// Define custom device and manufacturer names
+#define MIDI_DEVICE_NAME "Creativitas Robin" 
+#define MIDI_MANUFACTURER_NAME "Ian Hattwick"
+
+/** TinyUSB descriptors **/
+/*
+extern "C" uint16_t tusb_midi_load_descriptor(uint8_t *dst, uint8_t *itf) {
+    // Add custom string descriptors
+    //uint8_t manufacturer_index = tinyusb_add_string_descriptor(custom_manufacturer_name);
+    //uint8_t product_index = tinyusb_add_string_descriptor(custom_device_name);
+
+    // Get a free duplex endpoint for MIDI
+    uint8_t ep_num = tinyusb_get_free_duplex_endpoint();
+    TU_VERIFY(ep_num != 0);
+
+    // Create the MIDI descriptor with custom manufacturer and product indices
+    // uint8_t descriptor[TUD_MIDI_DESC_LEN] = {
+    //     TUD_MIDI_DESCRIPTOR(*itf, product_index, ep_num, (uint8_t)(0x80 | ep_num), 64)};
+    uint8_t descriptor[TUD_MIDI_DESC_LEN] = {
+    TUD_MIDI_DESCRIPTOR(*itf, 1, ep_num, (uint8_t)(0x80 | ep_num), 64)
+};
+    
+    *itf += 1;
+
+    // Copy the descriptor into the destination buffer
+    memcpy(dst, descriptor, TUD_MIDI_DESC_LEN);
+    return TUD_MIDI_DESC_LEN;
+}
+*/
+
 // From usb.org MIDI 1.0 specification. This 4 byte structure is the unit
 // of transfer for MIDI data over USB.
 typedef struct __attribute__((__packed__)) {
@@ -23,11 +53,6 @@ typedef struct __attribute__((__packed__)) {
 #define NOTE_OFF 0x80
 #define NOTE_ON 0x90
 #define CC 0xB0
-#define MIDI_CLOCK_TICK 0xF8
-#define MIDI_START 0xFA
-#define MIDI_CONTINUE 0xFB
-#define MIDI_STOP 0xFC
-
 
 static uint8_t const cable_num = 0; // MIDI jack associated with USB endpoint
 static uint8_t const channel = 0;   // 0 for channel 1
@@ -41,76 +66,42 @@ extern void handleNoteOff(uint8_t channel, uint8_t note);
 extern void handleControlChange(uint8_t channel, uint8_t number, uint8_t value);
 
 void usbMidiSetup(){
-
+  
+  //tinyusb_enable_interface(USB_INTERFACE_MIDI, TUD_MIDI_DESC_LEN, tusb_midi_load_descriptor);
+  //USB.begin();
+  
   usbMIDI.begin();
   USB.begin();
 }
 
-// ========================
-// MIDI Note Send Throttle
-// ========================
-
-struct MidiNoteMessage {
-  byte note;
-  byte velocity;
-};
-
-// Configurable max send interval
-unsigned long maxSendIntervalMs = 2;
-
-// Send timing state
-unsigned long lastSendTime = 0;
-
-// Fixed-size buffer
-const int midiBufferSize = 64;
-MidiNoteMessage midiNoteBuffer[midiBufferSize];
-volatile int bufferHead = 0;
-volatile int bufferTail = 0;
-
-// Add message to buffer
 void sendMidiNoteOn(byte note, byte velocity) {
-  velocity = constrain(velocity, 0, 127);
-
-  int nextHead = (bufferHead + 1) % midiBufferSize;
-  if (nextHead == bufferTail) {
-    // Buffer full — could add overflow handling here
-    //Serial.println("MIDI buffer full! Dropping note.");
-    return;
-  }
-
-  midiNoteBuffer[bufferHead].note = note;
-  midiNoteBuffer[bufferHead].velocity = velocity;
-  bufferHead = nextHead;
-}
-
-// Send one message if enough time has passed
-void processMidiSendQueue() {
-  if (bufferTail != bufferHead && millis() - lastSendTime >= maxSendIntervalMs) {
-    MidiNoteMessage msg = midiNoteBuffer[bufferTail];
-    bufferTail = (bufferTail + 1) % midiBufferSize;
-
-    usbMIDI.noteOn(msg.note, msg.velocity, 1);  // channel 1
-    lastSendTime = millis();
-  }
+  // if (tud_midi_mounted()) {
+  //   uint8_t note_on[3] = {NOTE_ON | channel, note, velocity};
+  //   tud_midi_stream_write(cable_num, note_on, 3);
+  // }
+  usbMIDI.noteOn(note,velocity, 1);
 }
 
 void sendMidiNoteOff(byte note) {
+  // if (tud_midi_mounted()) {
+  //   uint8_t note_off[3] = {NOTE_OFF | channel, note, 0};
+  //   tud_midi_stream_write(cable_num, note_off, 3);
+  // }
   usbMIDI.noteOff(note, 1);
 }
 
 void sendMidiCC(uint8_t num, uint8_t val) {
-  val = constrain(val, 0, 127);
   usbMIDI.controlChange(num, val);
-}
-
-void sendMidiClockMessage(uint8_t msg) {
-  if (tud_midi_mounted()) {
-    tud_midi_stream_write(0, &msg, 1);
-  }
+  // if (tud_midi_mounted()) {
+  //   uint8_t cc[3] = {CC | channel, num, val};
+  //   tud_midi_stream_write(cable_num, cc, 3);
+  // }
+  usbMIDI.controlChange(num, val, 1);
 }
 
 void processIncomingMidi() {
   
+
   midiEventPacket_t midi_packet_in = {0, 0, 0, 0};
 
   if (usbMIDI.readPacket(&midi_packet_in)) {

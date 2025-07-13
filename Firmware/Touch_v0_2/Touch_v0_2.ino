@@ -20,16 +20,16 @@
   - Supports serial debugging. set SERIAL_DEBUG to 1 to enable debugging
   - ENABLE_USB_MIDI should be set to 1 to enable USB MIDI functionality.
 */
-const byte ENABLE_USB_MIDI = 0;
-const byte SERIAL_DEBUG = 1;
+const byte ENABLE_USB_MIDI = 1;
+const byte SERIAL_DEBUG = 0;
 
 #include "USB_MIDI.h"
-#include "potentiometer.h"
 #include "controller.h"
-
+#include "hallEffect.h"
 #include "parameters.h"
 #include <Preferences.h>
 #include "src/m370_MPR121.h"
+#include "clock.h"
 Preferences preferences;
 ParameterObject parameters;
 
@@ -40,45 +40,28 @@ bool startup_leds = true;
 
 //#include "capsense.h"
 
- m370_MPR121 mpr121(43,44); //SDA,SCL
+m370_MPR121 mpr121(43,44); //SDA,SCL
+HallEffectSensor hall[] = { HallEffectSensor(), HallEffectSensor() };
+
+void setupESPNow();
+void setupClockTimer();
 
 
 int monitorInput = -1;
 /************** DEFINE INPUTS ******************/
-//(int ccNumber, int minInterval = 20, int inLow = 0, int inHigh = 127, int deltaThreshold = 2, float alpha = 0.2))
+//(int ccNumber, int minInterval = 20, int inLow = 0, int inHigh = 127, int deltaThreshold = 2, float minCutoff, float beta, float dCutoff ))
+//deltaThreshold: how much the value must change before a new value is sent
+//float minCutoff: Minimum cutoff frequency of the filter, in Hz. Lower values = more smoothing always (sluggish output).Higher values = more responsive overall (but possibly jittery).
+//float beta = Responsiveness scaling factor. Higher beta means more reactivity to fast movements (less smoothing).
+//float dCutoff: Derivative filter cutoff frequency. Low values = more stable velocity estimate, but might lag.
 CController cc[] = {
-  CController(0, 50, 0, 4095, 5, .3), //hall1
-  CController(1, 50, 0, 4095, 5, .3), //hall2
-  CController(2, 100, 10, 4000, 4, .2), //pot1
-  CController(3, 100, 10, 4000, 4, .2), //pot2
-  CController(4, 100, 20, 400, 10, .2),  //Capsense1
-  CController(5, 100, 20, 400, 10, .2), //Capsense2
-
-  //MPR121 cc[6] to cc[17]
-  CController(10, 50, 0, 2000, 10, .2),
-  CController(11, 50, 0, 2000, 10, .2),
-  CController(12, 50, 0, 2000, 10, .2),
-  CController(13, 50, 0, 2000, 10, .2),
-  CController(14, 50, 0, 2000, 10, .2),
-  CController(15, 50, 0, 2000, 10, .2),
-  CController(16, 50, 0, 2000, 10, .2),
-  CController(17, 50, 0, 2000, 10, .2),
-  CController(18, 50, 0, 2000, 10, .2),
-  CController(19, 50, 0, 2000, 10, .2),
-  CController(20, 50, 0, 2000, 10, .2),
-  CController(21, 50, 0, 2000, 10, .2)
+  CController(0, 5, 10, 4095, 5,   .001, 0.01, 4), //hall1
+  CController(1, 5, 10, 4095, 5,    .001, 0.01, 4), //hall2
+  CController(2, 50, 50, 4000, 16, 1, 0.02, 2), //pot1
+  CController(3, 50, 50, 4000, 16, 1, 0.02, 2), //pot2
+  CController(4, 50, 20, 400, 32, 1, 0.02, 2),  //Capsense1
+  CController(5, 50, 20, 400, 32, 1, 0.02, 2), //Capsense2
 };
-
-int velocityDepth = 200;
-
-enum InstrumentMode { MONOPHONIC, POLYPHONIC };
-InstrumentMode currentMode = MONOPHONIC;
-
-void setMode(InstrumentMode mode) {
-    currentMode = mode;
-    //Serial.printf("Switched to %s mode\n", mode == MONOPHONIC ? "Monophonic" : "Polyphonic");
-}
-
 
 /************** SETUP ******************/
 
@@ -102,9 +85,10 @@ void setup() {
 
   touchSetCycles(5,10); //(uint16_t measure, uint16_t sleep);
 
-  //setupFingeringToMidiNote();
-
   m370_cap_begin();
+
+  setupESPNow();
+  setupClockTimer();
 
 }//setup
 
@@ -160,188 +144,68 @@ void handleControlChange(uint8_t channel, uint8_t number, uint8_t value) {
 
 /************** LOOP ******************/
 
-byte currentSensor = 0;
-int measureCycles = 100;   // Default measure cycles
-int sleepCycles = 20;      // Default sleep cycles
-
 void loop() {
-  
+  processMidiSendQueue();
   // statusLed(0);
 
   // // Handle MIDI input
   static uint32_t timer = 0;
-  int interval = 50; 
-  static byte prevValue[] = {0,0,0,0,0};
-
-  static int hallEffectRange[2][2] = {
-    {4000,0}, {4000,0}
-  };
-  int hallVal[2];
-  hallVal[0] = analogRead(2);
-  hallVal[1] = analogRead(9);
-
-  if(0){
-    Serial.print( touchRead(4) );
-    Serial.print( "\t" );
-    Serial.print( touchRead(7) );
-    Serial.print( "\t" );
-    Serial.println();
-  }
-  
+  int interval = 2; 
 
   if(millis()-timer > interval){
     timer= millis();
+    int hallVal[2];
 
-    for(byte i=0;i<2;i++){
-      if(hallVal[i] < hallEffectRange[i][0]){
-        hallEffectRange[i][0] = hallVal[i];
-      } else if(hallVal[i] > hallEffectRange[i][1]){
-        hallEffectRange[i][1] = hallVal[i];
-      }
-      hallVal[i]  = map(hallVal[i], hallEffectRange[i][0], hallEffectRange[i][1], 0, 4095);
-          //ccValue = constrain(ccValue, 0, 511);
-    }
+    hallVal[0] = hall[0].update( analogRead(2) );
+    hallVal[1] = hall[1].update( analogRead(9) );
 
-    //cc[0].send(analogRead(12));
     cc[0].send(hallVal[0]); //12    2
     cc[1].send(hallVal[1]); // 5     9
     cc[2].send(analogRead(10)); //11    3
     cc[3].send(analogRead(8)); //10    4
-    cc[4].send(touchRead(11)/10); //4       10
-    cc[5].send(touchRead(7)/10); //7       7
+    cc[4].send( touchRead(11) / 10); //4       10
+    cc[5].send( touchRead(7) / 10); //7       7
 
     readCap();
-  }
 
-  //     if(ENABLE_USB_MIDI){
-  //       for(int i=0;i<10;i++){
-  //         cap[i].update();
-  //         if( cap[i].state == true && cap[i].getChange() == true){
-  //           sendMidiNoteOn( i, touchToMidi(cap[i].getValue()) );
-  //           // if(startup_leds){
-  //           //   leds[0] = CRGB(255, 0, 0);
-  //           //   leds[1] = CRGB(255, 0, 0);
-  //           // }
-  //           // statusLed(2);
-  //           // FastLED.show();
-  //         } else if( cap[i].state == false && cap[i].getChange() == true){
-  //           sendMidiNoteOff( i );
-  //           // if(startup_leds){
-  //           //   leds[0] = CRGB(0, 255, 0);
-  //           //   leds[1] = CRGB(0, 255, 0);
-  //           // }
-  //           // 
-  //           // built_in[0] = CRGB(0, 0, 0);
-  //           // statusLed(2);
-  //           // FastLED.show();
-  //         }
-  //       }
-  //     }
-        
-      
-    
-    //if( SERIAL_DEBUG ) Serial.println("\t");
-  return;
-}//loop
-
-void readCap(){
-  static byte lastTouchStatus = 0;
-  uint16_t touchStatus = mpr121.touched();
-
-  for (uint8_t i = 0; i < 12; i++) {
-    bool wasTouched = lastTouchStatus & (1 << i);
-    bool isTouched  = touchStatus     & (1 << i);
-    lastTouchStatus = touchStatus;
-
-    if (!wasTouched && isTouched) {
-      // Touched: 0 → 1
-      sendTouch(i, 1);
-    } else if (wasTouched && !isTouched) {
-      // Released: 1 → 0
-      sendTouch(i, 0);
+      if(0){
+      Serial.print( touchRead(11) );
+      Serial.print( "\t" );
+      Serial.print( touchRead(7) );
+      Serial.print( "\t" );
+      Serial.println();
     }
   }
-  //cc[6] to cc[17]
-        // for(int i=0;i<12;i++){
-        //   int filtered = mpr121.baselineData(i) - mpr121.filteredData(i);
-        //   //int filtered =  mpr121.filteredData(i);
-        //   //cc[i+10].send(filtered);
-        //   Serial.print(filtered);
-        //   Serial.print("\t");
-        // }
-        // Serial.println();
+}//loop
+
+void readCap() {
+  static uint16_t lastTouchStatus = 0;               // previous touch bitmask
+  uint16_t touchStatus = mpr121.touched();           // current touch bitmask
+
+  for (uint8_t i = 0; i < 12; i++) {
+    bool wasTouched = lastTouchStatus & (1 << i);    // bit i from last read
+    bool isTouched  = touchStatus     & (1 << i);    // bit i from current read
+
+    if (!wasTouched && isTouched) {
+      sendTouch(i, 1);  // rising edge
+    } else if (wasTouched && !isTouched) {
+      sendTouch(i, 0);  // falling edge
+    }
+  }
+
+  lastTouchStatus = touchStatus;  // update once, after loop
 }
 
 void sendTouch(byte num, byte val){
   const byte midiNotes[] = {48,50,52,53,55,57,59,60,62,64,65,67,69,71,72};
   if(SERIAL_DEBUG){
-    Serial.print("touch ");
+    Serial.print("touch\t");
     Serial.print(num);
     Serial.print("\t");
     Serial.println(val);
   } else{
     sendMidiNoteOn(midiNotes[num], val*127);
   }
-}
-
-// Function to parse serial input commands
-void parseSerialCommand() {
-    String command = Serial.readStringUntil('\n'); // Read input until newline
-
-    if (command.length() < 2) {
-        Serial.println("Invalid command");
-        return;
-    }
-
-    char type = command[0];          // First character is the command type
-    int value = command.substring(1).toInt(); // Extract the number after the command
-
-    switch (type) {
-        case 'p': // Change active sensor
-            if (value >= 0 && value < 10) {
-                currentSensor = value;
-                Serial.print("Active sensor set to: ");
-                Serial.println(currentSensor);
-            } else {
-                Serial.println("Invalid sensor number");
-            }
-            break;
-
-        case 'c': // Change measure cycles
-            if (value > 0) {
-                measureCycles = value;
-                touchSetCycles(measureCycles, sleepCycles);
-                Serial.print("Measure cycles set to: ");
-                Serial.println(measureCycles);
-            } else {
-                Serial.println("Invalid measure cycles value");
-            }
-            break;
-
-        case 's': // Change sleep cycles
-            if (value > 0) {
-                sleepCycles = value;
-                touchSetCycles(measureCycles, sleepCycles);
-                Serial.print("Sleep cycles set to: ");
-                Serial.println(sleepCycles);
-            } else {
-                Serial.println("Invalid sleep cycles value");
-            }
-            break;
-
-        default:
-            Serial.println("Unknown command");
-            break;
-    }
-}
-
-uint8_t touchToMidi(int val){
-  int min = velocityDepth;
-  int max = 2000-velocityDepth;
-  if(min>max) min = max;
-  val = constrain(val,min,max);
-  val = map(val, min,max, 0,127);
-  return uint8_t(constrain(val,0,127));
 }
 
 void statusLed(int num){
