@@ -2,8 +2,8 @@
 Wand v1_3
 */
 
-const byte ENABLE_USB_MIDI = 0;
-const byte SERIAL_DEBUG = 1;
+const byte ENABLE_USB_MIDI = 1;
+const byte SERIAL_DEBUG = 0;
 
 #include <Wire.h>
 #include "USB_MIDI.h"
@@ -89,7 +89,6 @@ void loop()
 
   static uint32_t timer = 0;
   int interval = 2; 
-  static byte prevValue[] = {0,0,0,0,0};
 
   if(millis()-timer > interval){
     timer= millis();
@@ -98,7 +97,7 @@ void loop()
     float magnitude = calcMagnitude();
 
     calcDrumStrike(magnitude);
-    return;
+    //return;
     updateLeakyGradient(magnitude, getBaseColorFromButtons());
 
 
@@ -110,9 +109,9 @@ void loop()
 
     TiltAngles angles = computeTiltAngles(imu.a.x, imu.a.y, imu.a.z);
 
-  cc[3].send(angles.roll);
-  cc[4].send(angles.pitch);
-  cc[5].send(angles.yaw); 
+    cc[3].send(angles.roll);
+    cc[4].send(angles.pitch);
+    cc[5].send(angles.yaw); 
     
   }
 } // LOOP
@@ -162,7 +161,7 @@ void updateLeakyGradient(float motionMagnitude, CRGB baseColor) {
   // --- Color trail with smoothing and wave modulation ---
   for (int i = 0; i < NUM_LEDS; i++) {
     // Brightness scaling based on distance from tip and motion level
-    uint8_t scale = map(i, 0, NUM_LEDS - 1, 0, motionLevel);
+    uint8_t scale = map(i, 0, NUM_LEDS - 1, 0.2, motionLevel);
 
     // LED 0 gets base color blended slightly with black
     if (i == 0) {
@@ -226,55 +225,40 @@ TiltAngles computeTiltAngles(float accelX, float accelY, float accelZ) {
   return angles;
 }
 
-void calcDrumStrike(float magnitude) {
+void calcDrumStrike(float magnitude){
   static float prevMagnitude = 0;
-  static bool triggered = false;
-  static bool noteSent = false;
-  static float peakMagnitude = 0;
-
-  const float triggerThreshold = 0.5;   // strike starts
-  const float resetThreshold = 0.1;     // ready to re-arm
-  const float peakFalloffThreshold = -0.5; // used to detect end of upward swing
-
   float delta = magnitude - prevMagnitude;
-  prevMagnitude = magnitude;
+  static bool triggered = false;
+
+   static float magnitudeBuffer[4];
+  static uint8_t magIndex = 0;
+    magnitudeBuffer[magIndex] = delta;
+    magIndex = (magIndex+1) % 4;
+
+  const float triggerThreshold = 1.0;
+  const float resetThreshold = 0.1;
 
   static unsigned long lastTriggerTime = 0;
   unsigned long now = millis();
 
   if (!triggered && delta > triggerThreshold) {
-    // Detected rising edge — begin strike
+    // Rising edge — trigger strike
     triggered = true;
-    noteSent = false;
-    peakMagnitude = magnitude;
+
+    float peakMagnitude = 0;
+    for(byte i=0; i<4; i++) peakMagnitude += magnitudeBuffer[ magIndex];
+    uint8_t velocity = map(peakMagnitude * 127, 100, 300, 20, 127);
+    velocity = constrain( velocity, 60,127);
+    if( millis() - lastTriggerTime > 5) sendButtonPress(36, velocity);
+    //usbMIDI.noteOn(36, velocity);
+    //usbMIDI.noteOff(60); // optional immediate off or schedule later
+
     lastTriggerTime = now;
   }
 
-  if (triggered) {
-    if (magnitude > peakMagnitude) {
-      peakMagnitude = magnitude; // update peak
-    }
-
-    // Once the value starts falling quickly, assume we passed the peak
-    if (!noteSent && delta < peakFalloffThreshold) {
-      uint8_t velocity = map(peakMagnitude * 100, 100, 300, 20, 127);
-      velocity = constrain(velocity, 1, 127);
-      sendButtonPress(36, velocity);  // Note On
-      noteSent = true;
-    }
-
-    // Wait until fully settled before resetting
-    if (magnitude < resetThreshold) {
-      triggered = false;
-      noteSent = false;
-      sendButtonPress(36, 0);  // Note Off
-    }
-
-    // Optional safety timeout
-    if (now - lastTriggerTime > 200) {
-      triggered = false;
-      noteSent = false;
-      sendButtonPress(36, 0);  // Note Off (failsafe)
-    }
+  if (triggered && magnitude < resetThreshold) {
+    // Falling edge — ready to trigger again
+    triggered = false;
+    sendButtonPress(36, 0);
   }
 }
