@@ -150,7 +150,6 @@ void handleNoteOff(uint8_t channel, uint8_t note) {
     FastLED.show();
     Serial.printf("Note Off: Channel %d, Note %d\n", channel + 1, note); 
   }
-
 }
 
 void handleControlChange(uint8_t channel, uint8_t number, uint8_t value) {
