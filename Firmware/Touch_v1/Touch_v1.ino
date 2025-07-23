@@ -20,8 +20,8 @@
   - Supports serial debugging. set SERIAL_DEBUG to 1 to enable debugging
   - ENABLE_USB_MIDI should be set to 1 to enable USB MIDI functionality.
 */
-const byte ENABLE_USB_MIDI = 1;
-const byte SERIAL_DEBUG = 0;
+const byte ENABLE_USB_MIDI = 0;
+const byte SERIAL_DEBUG = 1;
 
 #include "USB_MIDI.h"
 #include "controller.h"

@@ -1757,7 +1757,7 @@
 	)
 	(text "v2 fixes:\n+ 4 pin jumper cable header - JST XH?\n- revise capsense placement\n- check holes for connection to GTR\n- fix capsense breakout pins\n- update cap hole with silkscreen\n"
 		(exclude_from_sim no)
-		(at 40.64 132.588 0)
+		(at 19.558 173.228 0)
 		(effects
 			(font
 				(size 3 3)
