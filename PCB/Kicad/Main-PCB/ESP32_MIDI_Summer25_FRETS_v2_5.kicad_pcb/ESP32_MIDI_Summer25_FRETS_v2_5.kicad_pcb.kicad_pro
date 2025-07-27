@@ -519,7 +519,7 @@
       "gencad": "",
       "idf": "",
       "netlist": "",
-      "plot": "gerber-frets2/",
+      "plot": "gerber-frets2_5/",
       "pos_files": "",
       "specctra_dsn": "",
       "step": "ESP32_MIDI.step",

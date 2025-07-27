@@ -37,6 +37,8 @@ ParameterObject parameters;
 CRGB built_in[1]; // Array for LEDs on pin 21
 bool startup_leds = true; 
 
+
+
 //#include "capsense.h"
 bool mpr121_present[4] = {false, false, false, false};  // for 0x5A to 0x5D
 
@@ -99,7 +101,7 @@ void setup() {
   const byte numCapSensors = m370_cap_begin();
   if(SERIAL_DEBUG){
   Serial.print(numCapSensors);
-  Serial.println(' MPR121 devices found');
+  Serial.println(" MPR121 devices found");
   }
 
   setupESPNow();
@@ -149,8 +151,10 @@ void readCap() {
   uint64_t touchStatus = 0;             // Current 48-bit touch state
 
   for (uint8_t d = 0; d < 4; d++) {
+   if( SERIAL_DEBUG) Serial.println(mpr121_present[d]);
     if (mpr121_present[d]) {
       uint16_t deviceTouch = mpr121[d].touched();  // 12-bit mask
+      if( SERIAL_DEBUG)  Serial.println(deviceTouch, BIN);
       //Serial.println(deviceTouch);
       // if(deviceTouch == 0xFFFF) {
       //   m370_cap_begin();
@@ -169,7 +173,8 @@ void readCap() {
       // }
     }
   }
-
+  //if( SERIAL_DEBUG) Serial.print("touch ");
+  //if( SERIAL_DEBUG) Serial.println(touchStatus, BIN);
   for (uint8_t i = 0; i < 48; i++) {
     bool wasTouched = lastTouchStatus & ((uint64_t)1 << i);
     bool isTouched  = touchStatus     & ((uint64_t)1 << i);
@@ -215,8 +220,10 @@ uint8_t m370_cap_begin() {
   uint8_t count = 0;
 
   for (uint8_t i = 0; i < 4; i++) {
+    if( SERIAL_DEBUG) Serial.println(i);
     mpr121_present[i] = false;
     if (mpr121[i].begin(addresses[i])) {
+      if( SERIAL_DEBUG) Serial.println(addresses[i], HEX);
       mpr121_present[i] = true;
       //mpr121[i].setThresholds(12, 6);
       mpr121[i].chargeCurrent(63);
@@ -224,7 +231,7 @@ uint8_t m370_cap_begin() {
       count++;
     }
   }
-  delay(100);
+  delay(10);
 
   return count;  // number of MPR121s successfully initialized
 }
