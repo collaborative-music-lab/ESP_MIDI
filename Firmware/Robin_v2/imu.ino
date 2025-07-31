@@ -76,7 +76,7 @@ char report[80];
 
 void imuLoop(){
   static uint32_t timer = 0;
-  int interval = 50; 
+  int interval = 20; 
 
   if(millis()-timer > interval){
     //statusLed(1);
@@ -96,7 +96,7 @@ void imuLoop(){
       imuFiltered[i] = imuFiltered[i] * leak +  delta;
       
     
-      cc[5+i].send( int(imuFiltered[i] / 100) ) ;
+      cc[5+i].send( int(abs(imuFiltered[i]) / 100) ) ;
       // Serial.print(abs(  int(imuFiltered[i] / 500) ));
       // Serial.print("\t");
     }

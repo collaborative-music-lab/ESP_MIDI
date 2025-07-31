@@ -68,14 +68,14 @@ CController cc[] = {
   CController(3, 20, 0, 500, 10, .1), //potCapsense1
   CController(4, 20, 0, 500, 10, .1),  //potCapsense2
   //afterTouch for pads 0-7
-  CController(10, 20, 0, 127, 1, .5), //7 accelX
-  CController(11, 20, 0, 127, 1, .5), //8 accelkY
-  CController(12, 20, 0, 127, 1, .5), //9 accelZ
+  CController(10, 20, -127, 127, 1, .5), //7 accelX
+  CController(11, 20, -127, 127, 1, .5), //8 accelkY
+  CController(12, 20, -127, 127, 1, .5), //9 accelZ
   CController(20, 50, 0, 127, 1, .5), //10 tiltX
   CController(21, 50, 0, 127, 1, .5), //11 tilyY
   CController(22, 50, 0, 127, 1, .5), //12 tiltZ
-  CController(30, 50, 0, 127, 1, .5), //13 total magnitude
-  CController(17, 20, 0, 127, 1, .5),
+  CController(30, 20, 0, 127, 1, .5), //13 total magnitude
+  CController(17, 20, 0, 127, 1, .8),
 };
 
 int velocityDepth = 200;
@@ -129,8 +129,8 @@ void setup() {
   if( ENABLE_USB_MIDI != 1) Serial.println("USB MIDI not enabled");
 
   //changed from 5,10
-  touchSetCycles(6, 5); //(uint16_t number of measure per cycle, uint16_t sleep, how many cycles to wait before measuring again);
-
+  //touchSetCycles(6, 5); //(uint16_t number of measure per cycle, uint16_t sleep, how many cycles to wait before measuring again);
+  touchSetCycles(50,100);
   //setupFingeringToMidiNote();
   if( SERIAL_DEBUG) Serial.println("Serial enable");
 
