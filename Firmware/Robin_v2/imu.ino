@@ -87,7 +87,7 @@ void imuLoop(){
 
 
     float imuNew[] = {imu.a.x, imu.a.y, imu.a.z};
-    float leak = 0.8;
+    float leak = 0.9;
 
     for(byte i=0;i<3;i++){
       float delta = imuPrev[i] - imuNew[i];

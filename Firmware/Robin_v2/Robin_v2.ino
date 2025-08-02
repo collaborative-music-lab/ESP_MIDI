@@ -35,11 +35,17 @@
 const byte ENABLE_USB_MIDI = 1;
 const byte SERIAL_DEBUG = 0;
 
+//sensor global variables
+byte ccSendRate = 1;
+int touchChargeTime = 20;
+int touchSleepTime = 100;
+
 #include "USB_MIDI.h"
 #include <Wire.h>
 #include "potentiometer.h"
 #include "controller.h"
 #include "./src/LSM6.h"
+#include <esp_task_wdt.h>
 
 #include "parameters.h"
 #include <Preferences.h>
@@ -63,10 +69,10 @@ Potentiometer pots[] =  {Potentiometer(11)};
 //(int ccNumber, int minInterval = 20, int inLow = 0, int inHigh = 127, int deltaThreshold = 2, float alpha = 0.2))
 CController cc[] = {
   CController(0, 50, 0, 3000, 10, .1), //pot1
-  CController(1, 2, 1900, 2800, 3, .5), //
-  CController(2, 20, 0, 2000, 10, .1), //touchbar
-  CController(3, 20, 0, 500, 10, .1), //potCapsense1
-  CController(4, 20, 0, 500, 10, .1),  //potCapsense2
+  CController(1, 2, 1900, 2800, 3, .5), //watchdog timer
+  CController(2, 20, 0, 2000, 10, .1), //
+  CController(3, 20, 0, 500, 10, .1), //touchbar
+  CController(4, 20, 0, 500, 10, .1),  //
   //afterTouch for pads 0-7
   CController(10, 20, -127, 127, 1, .5), //7 accelX
   CController(11, 20, -127, 127, 1, .5), //8 accelkY
@@ -130,9 +136,25 @@ void setup() {
 
   //changed from 5,10
   //touchSetCycles(6, 5); //(uint16_t number of measure per cycle, uint16_t sleep, how many cycles to wait before measuring again);
-  touchSetCycles(50,100);
+  // touchSetCycles(50,100);
+  touchSetCycles( touchChargeTime, touchSleepTime);
   //setupFingeringToMidiNote();
   if( SERIAL_DEBUG) Serial.println("Serial enable");
+
+   // 1. Create configuration structure
+  esp_task_wdt_config_t wdt_config = {
+    .timeout_ms = 500,           // 0.5-second timeout
+    .idle_core_mask = 0,          // Don't monitor idle cores
+    .trigger_panic = true         // Reset on timeout
+  };
+  
+  // 2. Initialize with config struct
+  esp_task_wdt_init(&wdt_config);
+  
+  // 3. Add current task to WDT
+  esp_task_wdt_add(NULL);
+
+   cc[1].send(127);
 
 }//setup
 
@@ -171,17 +193,32 @@ void handleNoteOff(uint8_t channel, uint8_t note) {
 
 void handleControlChange(uint8_t channel, uint8_t number, uint8_t value) {
   statusLed(1);
-  if( number == 127) {monitorInput = -1; return;} //disable all monitoring
-  else if( number >=80 && number<100){ monitorInput = number - 80; return;} //monitor raw data
-  else if( number >=60 && number<80){ cap[number-60].upperThreshold = value*20; return;} //update high threshold
-  else if( number >=40 && number<60){ cap[number-40].lowerThreshold = value*20;} //update low threshold
-  else if( number >=20 && number<40){ cap[number-20].upperThreshold = value*20;} //update velocity depth
-  //else if( number >=0 && number<20){ monitorInput = number - 80; return;}
-  // 
-  // if (number == 120 && value == 120) { // CC 120 triggers the parameter query
-  //       sendStoredParameters();
-  //       return;
-  //   } else updateParameterValue(channel, number, value);
+  if( number == 100) {ccSendRate = value; return;}
+
+  else if( number == 101) {
+    touchChargeTime = (int)value*10;
+    touchSetCycles( touchChargeTime, touchSleepTime);
+    delay(50);
+    resetTouchBaselines();
+  } else if( number == 102) {
+    touchSleepTime = (int)value*10;
+    touchSetCycles( touchChargeTime, touchSleepTime);
+    delay(50);  
+    resetTouchBaselines();
+  } 
+  
+  else if( number == 110) {
+    cc[5].alpha = (float)value/127;
+  } else if( number == 111) {
+    cc[6].alpha = (float)value/127;
+  } else if( number == 112) {
+    cc[7].alpha = (float)value/127;
+  } 
+
+  else if( number == 127) {
+    ESP.restart(); // Clean restart  
+  } 
+
 }
 
 
@@ -194,6 +231,7 @@ int sleepCycles = 20;      // Default sleep cycles
 void loop() {
   imuLoop();
   statusLed(0);
+  processCCBuffer();
 
   // Handle MIDI input
   static uint32_t timer = 0;
@@ -202,7 +240,7 @@ void loop() {
 
   if(millis()-timer > interval){
     timer= millis();
-
+    
     for(int i=0;i<11;i++){
       cap[i].update();
     }
@@ -232,7 +270,10 @@ void loop() {
         FastLED.show();
       }
     }
-  }
+
+    esp_task_wdt_reset();
+    processIncomingMidi();
+  }//timer
         
   return;
 }//loop
@@ -257,70 +298,6 @@ void readTouchpads() {
 }
 
 
-void printVals(byte num, int raw, bool touch) {
-   Serial.print(num);
-    Serial.print(" ");
-  Serial.print(cap[num].raw);
-  Serial.print("\t");
-    int scaledTouch = touch ? 1000 : 0;
-    Serial.print(num);
-    Serial.print(" ");
-    Serial.print(raw);
-    Serial.print(" ");      // Space separates multiple values (if added later)
-    Serial.println(scaledTouch);
-}
-
-// Function to parse serial input commands
-void parseSerialCommand() {
-    String command = Serial.readStringUntil('\n'); // Read input until newline
-
-    if (command.length() < 2) {
-        Serial.println("Invalid command");
-        return;
-    }
-
-    char type = command[0];          // First character is the command type
-    int value = command.substring(1).toInt(); // Extract the number after the command
-
-    switch (type) {
-        case 'p': // Change active sensor
-            if (value >= 0 && value < 10) {
-                currentSensor = value;
-                Serial.print("Active sensor set to: ");
-                Serial.println(currentSensor);
-            } else {
-                Serial.println("Invalid sensor number");
-            }
-            break;
-
-        case 'c': // Change measure cycles
-            if (value > 0) {
-                measureCycles = value;
-                touchSetCycles(measureCycles, sleepCycles);
-                Serial.print("Measure cycles set to: ");
-                Serial.println(measureCycles);
-            } else {
-                Serial.println("Invalid measure cycles value");
-            }
-            break;
-
-        case 's': // Change sleep cycles
-            if (value > 0) {
-                sleepCycles = value;
-                touchSetCycles(measureCycles, sleepCycles);
-                Serial.print("Sleep cycles set to: ");
-                Serial.println(sleepCycles);
-            } else {
-                Serial.println("Invalid sleep cycles value");
-            }
-            break;
-
-        default:
-            Serial.println("Unknown command");
-            break;
-    }
-}
-
 uint8_t touchToMidi(int val){
   int min = velocityDepth;
   int max = 2000-velocityDepth;
@@ -328,6 +305,15 @@ uint8_t touchToMidi(int val){
   val = constrain(val,min,max);
   val = map(val, min,max, 0,127);
   return uint8_t(constrain(val,0,127));
+}
+
+void resetTouchBaselines() {
+  for(int i=0; i<11; i++) {
+    for(int j=0; j<100; j++) {
+      cap[i].update();
+      delay(1);
+    }
+  }
 }
 
 void statusLed(int num){

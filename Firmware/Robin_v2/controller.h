@@ -18,7 +18,6 @@ class CController {
 
       float smoothedValue = 0;   // Smoothed CC value (floating point)
       int deltaThreshold;    // Threshold for value change to send CC
-      float alpha;           // Smoothing factor (floating point)
 
   public:
       // Constructor
@@ -27,6 +26,7 @@ class CController {
           inLow(inLow), inHigh(inHigh), smoothedValue(0.0), deltaThreshold(deltaThreshold), alpha(alpha) {}
 
       byte debug = 0;
+      float alpha;           // Smoothing factor (floating point)
 
       // Initialize the touchpad (if necessary)
       void init() {

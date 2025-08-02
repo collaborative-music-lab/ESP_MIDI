@@ -93,13 +93,31 @@ void sendMidiNoteOff(byte note) {
   if( ENABLE_USB_MIDI )usbMIDI.noteOff(note, 1);
 }
 
+uint8_t ccBuffer[64];
+
 void sendMidiCC(uint8_t num, uint8_t val) {
-  usbMIDI.controlChange(num, val);
-  // if (tud_midi_mounted()) {
-  //   uint8_t cc[3] = {CC | channel, num, val};
-  //   tud_midi_stream_write(cable_num, cc, 3);
-  // }
-  usbMIDI.controlChange(num, val, 1);
+  if(num >=64) return;
+  ccBuffer[num] = val;
+  //usbMIDI.controlChange(num, val);
+}
+
+void processCCBuffer(){
+  static uint32_t timer = 0;
+  static byte ccIndex = 0;
+  if(millis()-timer > ccSendRate){
+    timer = millis();
+
+    for(byte i=0;i<64;i++){
+      byte curIndex = (ccIndex+i) %64;
+      if(ccBuffer[ curIndex] < 255 ){
+        usbMIDI.controlChange(curIndex, ccBuffer[ curIndex]);
+        ccBuffer[ curIndex] = 255;
+        ccIndex = (ccIndex+1) % 64;
+        return;
+      }
+    }
+  }
+  //usbMIDI.controlChange(num, val);
 }
 
 void processIncomingMidi() {
