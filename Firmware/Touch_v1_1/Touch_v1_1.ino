@@ -30,6 +30,8 @@ const byte SERIAL_DEBUG = 0;
 #include <Preferences.h>
 #include "src/m370_MPR121.h"
 #include "clock.h"
+
+#include <esp_task_wdt.h>
 Preferences preferences;
 ParameterObject parameters;
 
@@ -96,7 +98,7 @@ void setup() {
   if( ENABLE_USB_MIDI != 1) Serial.println("USB MIDI not enabled");
   esp_log_level_set("*", ESP_LOG_NONE);  // Suppress all component logs
 
-  touchSetCycles(5,10); //(uint16_t measure, uint16_t sleep);
+  touchSetCycles(10,100); //(uint16_t measure, uint16_t sleep);
 
   const byte numCapSensors = m370_cap_begin();
   if(SERIAL_DEBUG){
@@ -113,6 +115,18 @@ void setup() {
   FastLED.show();
   FastLED.setBrightness(50);  // Max brightness
 
+   // 1. Create configuration structure
+  esp_task_wdt_config_t wdt_config = {
+    .timeout_ms = 500,           // 0.5-second timeout
+    .idle_core_mask = 0,          // Don't monitor idle cores
+    .trigger_panic = true         // Reset on timeout
+  };
+  
+  // 2. Initialize with config struct
+  esp_task_wdt_init(&wdt_config);
+  
+  // 3. Add current task to WDT
+  esp_task_wdt_add(NULL);
 }//setup
 
 /************** LOOP ******************/
@@ -143,6 +157,8 @@ void loop() {
     cc[5].send( touchRead(7) / 10); //7       7
 
     readCap();
+
+    esp_task_wdt_reset();
   }
 }//loop
 
