@@ -98,7 +98,7 @@ void imuLoop(){
 
       imuFiltered[i] = imuFiltered[i] * leak +  delta;
       
-      cc[5+i].send( int(abs(imuFiltered[i]) / 200) ) ;
+      cc[5+i].send( int((imuFiltered[i]) / 200) ) ;
       // Serial.print(abs(  int(imuFiltered[i] / 500) ));
       // Serial.print("\t");
     }

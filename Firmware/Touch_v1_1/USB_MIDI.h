@@ -100,10 +100,32 @@ void processMidiSendQueue() {
 }
 
 
+uint8_t ccBuffer[64];
 
 void sendMidiCC(uint8_t num, uint8_t val) {
+  if(num >=64) return;
   val = constrain(val, 0, 127);
-  usbMIDI.controlChange(num, val);
+  ccBuffer[num] = val;
+  //usbMIDI.controlChange(num, val);
+}
+
+void processCCBuffer(){
+  static uint32_t timer = 0;
+  static byte ccIndex = 0;
+  if(millis()-timer > ccSendRate){
+    timer = millis();
+
+    for(byte i=0;i<64;i++){
+      byte curIndex = (ccIndex+i) %64;
+      if(ccBuffer[ curIndex] < 255 ){
+        usbMIDI.controlChange(curIndex, ccBuffer[ curIndex]);
+        ccBuffer[ curIndex] = 255;
+        ccIndex = (ccIndex+1) % 64;
+        return;
+      }
+    }
+  }
+  //usbMIDI.controlChange(num, val);
 }
 
 void sendMidiClockMessage(uint8_t msg) {

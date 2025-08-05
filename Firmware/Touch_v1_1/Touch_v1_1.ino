@@ -22,6 +22,7 @@
 */
 const byte ENABLE_USB_MIDI = 1;
 const byte SERIAL_DEBUG = 0;
+byte ccSendRate = 1;
 
 #include "USB_MIDI.h"
 #include "controller.h"
@@ -133,6 +134,7 @@ void setup() {
 
 void loop() {
   processMidiSendQueue();
+  processCCBuffer();
   
 
   // // Handle MIDI input
@@ -140,8 +142,6 @@ void loop() {
   int interval = 2; 
 
   if(millis()-timer > interval){
-    processIncomingMidi();
-    statusLed(0);
 
     timer= millis();
     int hallVal[2];
@@ -157,7 +157,8 @@ void loop() {
     cc[5].send( touchRead(7) / 10); //7       7
 
     readCap();
-
+    processIncomingMidi();
+    statusLed(0);
     esp_task_wdt_reset();
   }
 }//loop
