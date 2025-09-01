@@ -14,6 +14,8 @@ class HallEffectSensor {
         int delta = abs(analogVal - prevVal);
         prevVal = analogVal;
 
+        if(delta > 300 && _triggered == 0) _triggered = 1 ;
+
         if (delta < stabilityThreshold) {
             if (stableStart == 0) stableStart = millis();
 
@@ -36,7 +38,16 @@ class HallEffectSensor {
         }
 
         lastVal = constrain(mapped, 0, 4095);
+        if(_triggered == 2 && lastVal < 200) _triggered = 0;
         return lastVal;
+    }
+
+    int triggered(){
+      if(_triggered == 1){
+        _triggered = 2;
+        return 1;
+      } 
+      else return 0;
     }
 
     int getLastValue() const {
@@ -55,6 +66,7 @@ class HallEffectSensor {
     int prevVal;
     unsigned long stableStart;
     int lastVal;
+    byte _triggered = 0;
 
     // Tunable parameters
     const int stabilityThreshold = 4;

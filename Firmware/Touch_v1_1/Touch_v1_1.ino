@@ -45,12 +45,22 @@ bool startup_leds = true;
 //#include "capsense.h"
 bool mpr121_present[4] = {false, false, false, false};  // for 0x5A to 0x5D
 
+/*
+m370_MPR121 mpr121[] = {
+  m370_MPR121(44,43),
+    m370_MPR121(44,43),
+      m370_MPR121(44,43),
+        m370_MPR121(44,43)
+        }; //SDA,SCL
+*/
+//reversed i2c for original fret boards
 m370_MPR121 mpr121[] = {
   m370_MPR121(43,44),
     m370_MPR121(43,44),
       m370_MPR121(43,44),
         m370_MPR121(43,44)
         }; //SDA,SCL
+        
 
 HallEffectSensor hall[] = { HallEffectSensor(), HallEffectSensor() };
 
@@ -148,6 +158,8 @@ void loop() {
 
     hallVal[0] = hall[0].update( analogRead(2) );
     hallVal[1] = hall[1].update( analogRead(9) );
+    if(hall[0].triggered() == 1)  sendMidiNoteOn(24, 127);
+    if(hall[1].triggered() == 1)  sendMidiNoteOn(26, 127);
 
     cc[0].send(hallVal[0]); //12    2
     cc[1].send(hallVal[1]); // 5     9
