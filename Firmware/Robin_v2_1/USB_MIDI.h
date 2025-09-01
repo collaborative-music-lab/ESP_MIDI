@@ -69,7 +69,7 @@ void usbMidiSetup(){
   
   //tinyusb_enable_interface(USB_INTERFACE_MIDI, TUD_MIDI_DESC_LEN, tusb_midi_load_descriptor);
   //USB.begin();
-  
+  USB.productName("Robin v2.1");  // Change this to set the macOS name
   usbMIDI.begin();
   USB.begin();
 }
