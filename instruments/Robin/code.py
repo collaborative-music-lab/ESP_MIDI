@@ -13,13 +13,20 @@ num_touch = 11
 touchPins = [8, 9, 10, 5, 4, 3, 2, 1, 13, 6, 7]
 button = [sensors.TouchButton(touchPins[i]) for i in range(num_touch)]
 thresholds= [
-    40000,
-    40000, 40000, 35000,
-    28000, 28000, 28000, 26000,
-    50000, 50000, 40000]
-for i in range(num_touch):
-    button[i].set_threshold(thresholds[i])
+    1000,
+    1000, 300, 800,
+    500, 160, 280, 260,
+    500, 500, 400]
+button[9].set_threshold(thresholds[9])
+button[10].set_threshold(thresholds[10])
+
+def update_thresholds():
+    for i in range(num_touch-3):
+        button[i].set_threshold(thresholds[i])
+    print('updated thresholds')
     
+update_thresholds()
+
 # left = [4,3,2,1]
 # right = [9,10,5]
 # thumb = 8
@@ -48,8 +55,12 @@ while True:
 #             print(i, button[i].value)
             value = button[i].get_state()
 #             print(button[i].state)
-            if value == "down": msg.append(1)
+            if value == "pressed":
+                if i == 9: update_thresholds()
+                msg.append(1)
+            elif value == "down": msg.append(1)
             elif value == "released": msg.append(0)
+            elif value == "up": msg.append(0)
             else: msg.append(0)
 #         print(msg)
             
@@ -77,7 +88,7 @@ while True:
                 count += 1
         
         if count > 0:
-            r_bend = r_bend/500/count
+            r_bend = r_bend/500/count*20
             midi.force_send_cc(0, r_bend)
 #             print('R', count, r_bend)
         
@@ -88,12 +99,15 @@ while True:
                 l_bend += button[i].value
                 count += 1
         if count > 0:
-            l_bend = l_bend/500/count
+            l_bend = l_bend/500/count*20
             midi.force_send_cc(1, l_bend)
 #             print('L', count, l_bend)
         
         # amplitude
-        level = level*0.8 + button[0].value/500 * .2
+        level = level*0.2 + (button[0].value/20) * .8
         midi.send_cc(2, level)
-        print(button[0].value,button[1].value,button[4].value  )
+#         print(level)
+#         print(button[0].value,button[1].value,button[4].value  )
+
+        
         
