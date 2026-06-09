@@ -35,9 +35,12 @@ class ESPNowPeerManager:
         # Initialize ESP-NOW
         self.espnow = espnow.ESPNow()
         
-        # Peer storage: {mac_address: {'name': str, 'type': str, 'index': int}}
-        self.peers = {}
+        # Peer storage: {'name': str, 'type': str, 'peer':peer}
+        self.peers = []
         self._peer_names = {} # Track names for duplicate detection, {base_name: [count]}
+        self.broadcast_mac = b'\xff\xff\xff\xff\xff\xff'
+        self.broadcast_peer = espnow.Peer(mac= b'\xff\xff\xff\xff\xff\xff',channel=6)
+        self.espnow.peers.append(self.broadcast_peer)
         
         # Timing
         self._last_broadcast = time.time()
@@ -82,10 +85,13 @@ class ESPNowPeerManager:
         # Broadcast message: [MAC, Name, Type]
         broadcast_data = f"{self._mac_to_string(self.mac_address)}|{self.device_name}|{self.device_type}".encode()
         
-        # Send to broadcast address (all peers)
-        self.espnow.send(b'\xff\xff\xff\xff\xff\xff', broadcast_data)
-        self._last_broadcast = now
-        return True
+        try:
+            self.espnow.send(broadcast_data, self.broadcast_peer)
+            self._last_broadcast = now
+            return True
+        except Exception as e:
+            print(f"[ERROR] Failed to broadcast: {e}")
+            return False
     
     def add_peer(self, mac_address: bytes, name: str, device_type: str) -> str:
         """
@@ -108,16 +114,18 @@ class ESPNowPeerManager:
         # Generate unique name
         peer_name = self._generate_peer_name(name)
         
-        # Add to ESP-NOW
-        self.espnow.add_peer(mac_address)
+        # # Create espnow.Peer object
+        peer_obj = espnow.Peer(mac=mac_address, channel=self.channel)
+        self.espnow.peers.append(peer_obj)
         
-        # Store peer info
+        # Add to peers array
         peer_index = len(self.peers)
-        self.peers[mac_address] = {
+        self.peers.append({
             'name': peer_name,
+            'peer': peer_obj,
             'type': device_type,
-            'index': peer_index
-        }
+            'mac': mac_address
+        })
         
         print(f"[PEER ADDED] {peer_name} ({device_type}) - {mac_str}")
         return peer_name
@@ -174,21 +182,21 @@ class ESPNowPeerManager:
             message: Message to send
             
         Returns:
-            Number of peers message was sent to
+            True if sent successfully, False otherwise
         """
-        count = 0
         msg_bytes = message.encode('utf-8')
         
-        for mac in self.peers.keys():
+        for peer_obj in self.peers:
             try:
-                self.espnow.send(mac, msg_bytes)
-                count += 1
+                self.espnow.send(msg_bytes, peer_obj['peer'])
+                return True
             except Exception as e:
-                print(f"[ERROR] Failed to send to peer: {e}")
+                print(f"[ERROR] Failed to send to {peer_obj['name']}: {e}")
+                return False
         
-        return count
+        return False
     
-    def send_to_peer(self, target: str | int, message: str) -> bool:
+    def send_to_peer(self, target, message: str) -> bool:
         """
         Send message to specific peer by name or index.
         
@@ -199,42 +207,40 @@ class ESPNowPeerManager:
         Returns:
             True if sent successfully, False otherwise
         """
-        mac_address = self._resolve_peer(target)
+        peer_obj = self._resolve_peer(target)
         
-        if mac_address is None:
+        if peer_obj is None:
             print(f"[ERROR] Peer not found: {target}")
             return False
         
         try:
             msg_bytes = message.encode('utf-8')
-            self.espnow.send(mac_address, msg_bytes)
-            peer_name = self.peers[mac_address]['name']
-            print(f"[SENT] To {peer_name}: {message}")
+            self.espnow.send(msg_bytes, peer_obj['peer'])
+            print(f"[SENT] To {peer_obj['name']}: {message}")
             return True
         except Exception as e:
             print(f"[ERROR] Failed to send message: {e}")
             return False
     
-    def _resolve_peer(self, target: str | int) -> bytes | None:
+    def _resolve_peer(self, target):
         """
-        Resolve peer name or index to MAC address.
+        Resolve peer name or index to peer object.
         
         Args:
             target: Peer name (string) or index (int)
             
         Returns:
-            MAC address bytes or None if not found
+            Peer object dict or None if not found
         """
         if isinstance(target, int):
             # Search by index
-            for mac, info in self.peers.items():
-                if info['index'] == target:
-                    return mac
+            if 0 <= target < len(self.peers):
+                return self.peers[target]
         else:
             # Search by name
-            for mac, info in self.peers.items():
-                if info['name'] == target:
-                    return mac
+            for peer in self.peers:
+                if peer['name'] == target:
+                    return peer
         
         return None
     
@@ -243,17 +249,17 @@ class ESPNowPeerManager:
         Get list of all peers.
         
         Returns:
-            List of peer dictionaries with name, type, index, and MAC
+            List of peer dictionaries with index, name, type, and MAC
         """
         peers_list = []
-        for mac, info in self.peers.items():
+        for index, peer in enumerate(self.peers):
             peers_list.append({
-                'index': info['index'],
-                'name': info['name'],
-                'type': info['type'],
-                'mac': self._mac_to_string(mac)
+                'index': index,
+                'name': peer['name'],
+                'type': peer['type'],
+                'mac': self._mac_to_string(peer['mac'])
             })
-        return sorted(peers_list, key=lambda x: x['index'])
+        return peers_list
     
     def print_peers(self):
         """Print formatted peer list."""
@@ -265,7 +271,6 @@ class ESPNowPeerManager:
         for peer in self.get_peers():
             print(f"  [{peer['index']}] {peer['name']:15} ({peer['type']:12}) {peer['mac']}")
         print()
-        
 
 
 
