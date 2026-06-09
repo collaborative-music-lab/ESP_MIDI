@@ -25,6 +25,7 @@ class ESPNowPeerManager:
         wifi.radio.start_ap(" ", "", channel=6, max_connections=0)
         wifi.radio.stop_ap()
         self.mac_address = wifi.radio.mac_address
+        self.channel = 6
         print(f"My MAC: {self.mac_address.hex()}")
 
 
@@ -83,7 +84,7 @@ class ESPNowPeerManager:
             return False
         
         # Broadcast message: [MAC, Name, Type]
-        broadcast_data = f"{self._mac_to_string(self.mac_address)}|{self.device_name}|{self.device_type}".encode()
+        broadcast_data = f"ID|{self.device_name}|{self.device_type}".encode()
         
         try:
             self.espnow.send(broadcast_data, self.broadcast_peer)
@@ -105,18 +106,21 @@ class ESPNowPeerManager:
         Returns:
             Generated peer name with numeric suffix
         """
-        mac_str = self._mac_to_string(mac_address)
+        mac_str = (mac_address)
         
         # Check if peer already exists
-        if mac_address in self.peers:
-            return self.peers[mac_address]['name']
+        for peer in self.peers:
+            if peer['mac'] == mac_address:
+                return peer['name']
         
         # Generate unique name
         peer_name = self._generate_peer_name(name)
         
         # # Create espnow.Peer object
         peer_obj = espnow.Peer(mac=mac_address, channel=self.channel)
-        self.espnow.peers.append(peer_obj)
+        try:
+            self.espnow.peers.append(peer_obj)
+        except Exception as e: print(e)
         
         # Add to peers array
         peer_index = len(self.peers)
@@ -142,37 +146,46 @@ class ESPNowPeerManager:
         if not self.espnow:  # Check if event exists
             return False
         
-        packet = self.espnow.read()  # Read the packet
-        
+        try:
+            packet = self.espnow.read()
+        except Exception as e:
+            print("read error:", e)
+            return None
+
         if packet is None:
             return False
         
+        # packet.msg contains the message bytes
+        # packet.mac contains the sender's MAC address
+        parts = None
         try:
-            # packet.msg contains the message bytes
-            # packet.mac contains the sender's MAC address
-            data = packet.msg.decode('utf-8')
-            sender_mac = packet.mac
-            
+            data = packet.msg.decode("utf-8")
             parts = data.split('|')
-            
-            if len(parts) == 3:
-                # Broadcast message (peer discovery)
-                mac_str, name, device_type = parts
-                mac_bytes = self._mac_to_bytes(mac_str)
-                
-                # Don't add ourselves
-                if mac_bytes == self.mac_address:
-                    return False
-                
-                self.add_peer(mac_bytes, name, device_type)
-                return True
-            else:
-                # Regular message - return packet for application to handle
-                return packet
-        
         except Exception as e:
-            print(f"[ERROR] Failed to parse message: {e}")
-            return False
+            print("decode error:", e)
+            return packet
+        sender_mac = packet.mac
+        
+        msg_type, name, device_type = parts
+        if parts[0] == 'ID':
+            # Broadcast message (peer discovery)
+            msg_type, name, device_type = parts
+            
+            # Don't add ourselves
+            if sender_mac == self.mac_address:
+                return False
+            
+            try:
+                self.add_peer(sender_mac, name, device_type)
+                return True
+            except Exception as e:
+                print(f"[ERROR] Failed to add peeer: {e}")
+                return False
+        else:
+            # Regular message - return packet for application to handle
+            return parts
+        
+        
     
     def broadcast(self, message: str) -> int:
         """
@@ -282,13 +295,24 @@ manager = ESPNowPeerManager(
 )
 
 # Main loop
-try:
-    while True:
+prev_time = 0
+send_time = 0
+while True:
+    now = time.monotonic()
+    
+    # check for new msgs
+    if now - prev_time >= 0.01:
+        prev_time = now
         # Broadcast presence periodically
         manager.broadcast_presence()
         
         # Listen for incoming messages and peer discoveries
-        manager.handle_incoming()
+        msg = manager.handle_incoming()
+        if msg: print(msg)
+        
+    # send msgs
+    if now - send_time >= 1:
+        send_time = now
         
         # Send to specific peer by index
         if len(manager.peers) > 0:
@@ -303,9 +327,5 @@ try:
             manager.broadcast("Broadcast message!")
         
         # Print peers periodically
-        manager.print_peers()
-        
-        time.sleep(5)
+#         manager.print_peers()
 
-except KeyboardInterrupt:
-    print("Stopping...")
