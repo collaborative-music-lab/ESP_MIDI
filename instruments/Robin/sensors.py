@@ -93,7 +93,8 @@ class TouchButton:
         if not self.button.value:
             if raw < self.baseline:
                 self.baseline = raw
-                self.button.threshold = self.button.raw_value + self.threshold
+                new_threshold =  self.button.raw_value + self.threshold 
+                if new_threshold < 65535 :  self.button.threshold = new_threshold
             else: self.baseline += self.baseline_smoothing
         self.value = raw - self.baseline
 #         print(raw, self.value, self.baseline)

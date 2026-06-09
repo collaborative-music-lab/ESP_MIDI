@@ -3,7 +3,8 @@ import time
 
 def get_magnitude(data):
     """Calculates total force (Resultant Vector)"""
-    return math.sqrt(sum(val**2 for val in data))
+    mag = math.sqrt(sum(val**2 for val in data))
+    return abs(mag-1)
 
 def get_tilt_angles(accel):
     """
@@ -35,3 +36,11 @@ def low_pass_filter(new_val, prev_filtered, alpha=0.1):
     alpha 0.1 = 90% old data, 10% new data.
     """
     return (alpha * new_val) + (1.0 - alpha) * prev_filtered
+def onepole(new_val, prev_filtered, alpha=0.1):
+    return low_pass_filter(new_val, prev_filtered, alpha)
+
+def smooth(new_val, prev_val, up=0.1, down=0.9):
+    alpha = up
+    if new_val < prev_val:
+        alpha = down
+    return low_pass_filter(new_val, prev_val, alpha)
