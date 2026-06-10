@@ -35,7 +35,7 @@ def low_pass_filter(new_val, prev_filtered, alpha=0.1):
     Smooths out jitter. 
     alpha 0.1 = 90% old data, 10% new data.
     """
-    return (alpha * new_val) + (1.0 - alpha) * prev_filtered
+    return (1 - alpha) * new_val + alpha * prev_filtered
 def onepole(new_val, prev_filtered, alpha=0.1):
     return low_pass_filter(new_val, prev_filtered, alpha)
 
