@@ -506,7 +506,7 @@
     "pinned_symbol_libs": []
   },
   "meta": {
-    "filename": "ESP32_MIDI2CV.kicad_pro",
+    "filename": "ESP32MIDI2CV_v2.kicad_pro",
     "version": 3
   },
   "net_settings": {
@@ -700,18 +700,18 @@
     "subpart_id_separator": 0,
     "top_level_sheets": [
       {
-        "filename": "ESP32_MIDI2CV.kicad_sch",
-        "name": "ESP32_MIDI2CV",
-        "uuid": "00000000-0000-0000-0000-000000000000"
+        "filename": "ESP32MIDI2CV_v2.kicad_sch",
+        "name": "ESP32MIDI2CV_v2",
+        "uuid": "41e4c161-2329-4e5f-9dd3-fb5a1db779ba"
       }
     ],
-    "used_designators": "",
+    "used_designators": "MidiOut1,C2-3,#PWR9-10,#PWR18-19,D5-6,U4,In1,R10-14",
     "variants": []
   },
   "sheets": [
     [
       "41e4c161-2329-4e5f-9dd3-fb5a1db779ba",
-      "Root"
+      "ESP32MIDI2CV_v2"
     ]
   ],
   "text_variables": {},

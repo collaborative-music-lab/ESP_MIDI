@@ -60,7 +60,7 @@
     "ssh_key": ""
   },
   "meta": {
-    "filename": "ESP32_MIDI2CV.kicad_prl",
+    "filename": "ESP32MIDI2CV_v2.kicad_prl",
     "version": 5
   },
   "net_inspector_panel": {
