@@ -85,18 +85,27 @@ class TouchButton:
         self.baseline = self.button.raw_value
         self.baseline_smoothing = 10
         self.threshold = 100
+        self.calibration_mode = False
+        
+    def calibrate(self):
+        self.calibration_mode = True
+        self.button.threshold = 10000
         
     def update(self):
         raw = self.button.raw_value * (1-self.smoothing) + self.prev_raw * self.smoothing
         self.prev_raw = raw
 #         print(raw, self.prev_raw, self.baseline)
-        if not self.button.value:
+        if not self.button.value or self.calibration_mode:
             if raw < self.baseline:
                 self.baseline = raw
                 new_threshold =  self.baseline + self.threshold 
                 if new_threshold < 65535 :  self.button.threshold = math.floor(new_threshold)
             else: self.baseline += self.baseline_smoothing
         self.value = raw - self.baseline
+        if self.calibration_mode:
+            if self.value < 50:
+                self.calibration_mode = False
+                self.set_threshold(self.threshold)
 #         print(raw, self.value, self.baseline)
 #         self.state = self.get_state()
         
