@@ -13,7 +13,6 @@ from esp_now import ESPNowPeerManager
 
 handler = event_handler.EventHandler()
 
-
 DEBUG = True
 
 dac = MCP4728()
@@ -64,11 +63,19 @@ def handle_dac():
     handler.schedule_ms(100,handle_dac)
     print(index, scale[math.floor(index/8)%len(scale)]*step / 4095 * 5)
 
-handler.schedule_ms(100,handle_dac)
+# handler.schedule_ms(100,handle_dac)
     
-    
+clock_timer = 0
+bpm = 100
+bpm_seconds = 60/bpm
+
 while True:
     now = time.monotonic()
+    
+    if now  - clock_timer > bpm_seconds:
+        clock_timer = now
+        dac.set(0,4095)
+        handler.schedule_ms(10, lambda: dac.set(0,0))
     
     current_time = time.monotonic()
     handler.update()
