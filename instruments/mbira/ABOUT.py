@@ -1,6 +1,6 @@
-# Robin v2
+# Mbira
 
-# Recorder inspired instrument With an IMU, 10 touchpads, a touchstrip, and a potentiometer with touchsense on its body.
+# 
 # 
 # Pins:
 # * I2C [43,44] # SCL, SDA

@@ -3,7 +3,7 @@ import board
 import busio
 
 # Initialize I2C using the board's default SCL and SDA pins
-i2c = busio.I2C(board.D43, board.D44)
+i2c = busio.I2C(board.D43, board.D44) #SCL, SDA
 
 def scan_i2c():
     
@@ -32,4 +32,4 @@ def scan_i2c():
 
 while True:
     scan_i2c()
-    time.sleep(5)  # Rescan every 5 seconds
+    time.sleep(1)  # Rescan every 5 seconds

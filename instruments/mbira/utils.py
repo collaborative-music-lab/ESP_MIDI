@@ -109,3 +109,12 @@ def scale(input, in_low = 0, in_high = 1, out_low = 0, out_high = 127, curve = 1
     value = value ** curve
     value = value * (out_high-out_low) + out_low
     return value
+
+def dtop(val, scale):
+    # converts a scale degree to a midi note
+    length  = len(scale)
+#     print(val, scale[val%length] + math.floor(val/length)*12 , scale)
+    return scale[val%length] + math.floor(val/length)*12 
+
+
+    

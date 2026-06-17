@@ -4,8 +4,8 @@ import time
 import struct
 
 class IMU:
-    def __init__(self, board_type="LSM6", SDA=board.IO43, SCL=board.IO44):
-        self.i2c = busio.I2C(SCL, SDA) # Note: SCL is usually first in busio.I2C
+    def __init__(self, i2c, board_type="LSM6"):
+        self.i2c = i2c # Note: SCL is usually first in busio.I2C
         self.BOARD = board_type
         # LSM6 0x6B, BMI 0x69
         self.DEVICE_ADDRESS = 0x6B if self.BOARD == "LSM6" else 0x69 
