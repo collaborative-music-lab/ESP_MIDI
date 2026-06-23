@@ -57,7 +57,7 @@ class MidiHandler:
         if num < 0: num = 0
         elif num > 127: num = 127
         
-        if val != cc_values[num]:
+        if val != self.cc_values[num]:
             if midi_debug: print('CC: ', num,val)
     #         if num == 12: print(val)
             self.cc_values[num] = val

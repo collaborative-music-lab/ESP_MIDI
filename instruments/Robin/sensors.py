@@ -83,9 +83,10 @@ class TouchButton:
         self.state = "up"
         self.smoothing = 0.5
         self.baseline = self.button.raw_value
-        self.baseline_smoothing = 10
+        self.baseline_smoothing = 1
         self.threshold = 100
         self.calibration_mode = False
+        self.peak = 0
         
     def calibrate(self):
         self.calibration_mode = True
@@ -93,19 +94,20 @@ class TouchButton:
         
     def update(self):
         raw = self.button.raw_value * (1-self.smoothing) + self.prev_raw * self.smoothing
+        if raw > self.peak: self.peak = raw
         self.prev_raw = raw
 #         print(raw, self.prev_raw, self.baseline)
         if not self.button.value or self.calibration_mode:
             if raw < self.baseline:
                 self.baseline = raw
                 new_threshold =  self.baseline + self.threshold 
-                if new_threshold < 65535 :  self.button.threshold = math.floor(new_threshold)
+                if new_threshold < 35535 :  self.button.threshold = math.floor(new_threshold)
             else: self.baseline += self.baseline_smoothing
-        self.value = raw - self.baseline
-        if self.calibration_mode:
-            if self.value < 50:
-                self.calibration_mode = False
-                self.set_threshold(self.threshold)
+        self.value = (raw - self.baseline)/self.peak
+#         if self.calibration_mode:
+#             if self.value < 50:
+#                 self.calibration_mode = False
+#                 self.set_threshold(self.threshold)
 #         print(raw, self.value, self.baseline)
 #         self.state = self.get_state()
         
@@ -116,7 +118,7 @@ class TouchButton:
         - "released"
         - None
         """
-        current = self.button.value
+        current = self.value > self.threshold
 
         if current != self.prev_state:
             self.prev_state = current
@@ -147,7 +149,7 @@ class TouchButton:
     def set_threshold(self, value):
         try:
             self.threshold = value
-            self.button.threshold = self.button.raw_value + self.threshold
+#             self.button.threshold = self.button.raw_value + self.threshold
         except Exception as e:
             print("bad threshold ", self.button.raw_value + self.threshold, e)
     
