@@ -8,7 +8,7 @@ from imu_driver import IMU
 from imu_processing import *
 from midi_handler import MidiHandler
 
-DEBUG_TOUCH = True
+DEBUG_TOUCH = False
 DEBUG_CAP = False
 DEBUG_ONE = False
 
@@ -48,10 +48,9 @@ update_thresholds()
 def note_on(note, vel):
     print("NOTE_ON", note, vel)
     if note == 0:
-        for b in button:
-            b.calibrate()
+        update_thresholds()
     elif note == 1:
-        button[vel].set_threshold(10000)
+        button[note-1].set_threshold(vel/127)
 midi.on_note_on = note_on
 
 # left = [4,3,2,1]
@@ -61,6 +60,7 @@ midi.on_note_on = note_on
 # strip = 7
 
 cap_timer = 0
+control_timer = 0
 print_timer = 0
 
 scale = [0,2,4,5,7,9,11,12,14,16,17,19,21,23,24]
@@ -69,7 +69,7 @@ right_note = 0
 level = 0
 
 touch_interval = 0.2 if DEBUG_TOUCH else 0.001
-control_interval = 0.2 if DEBUG_CAP else 0.02
+control_interval = 0.2 if DEBUG_CAP else 0.01
 imu.update()
 accel = [imu.accel_cur[i] for i in range(3)]
 magnitude = get_magnitude(accel)
@@ -77,8 +77,10 @@ tilt = [0,0,0]
 
 level_smoothing = 0.9
 
+prev_timer = 0
 while True:
     
+    # touch monitoring
     if time.monotonic()-cap_timer >= touch_interval:
         cap_timer= time.monotonic()
         midi.update()
@@ -105,22 +107,26 @@ while True:
             else: msg.append(0)
         if DEBUG_TOUCH: print(msg)
         if DEBUG_ONE:
-            print(DEBUG_ONE, button[DEBUG_ONE].get_state(), button[DEBUG_ONE].value, button[DEBUG_ONE].peak, button[DEBUG_ONE].baseline)
+            print(DEBUG_ONE, button[DEBUG_ONE].get_state(), button[DEBUG_ONE].button.raw_value, button[DEBUG_ONE].peak, button[DEBUG_ONE].baseline)
             
             
-    if time.monotonic()-print_timer >= control_interval:
-        print_timer = time.monotonic()
+    if time.monotonic()-control_timer >= control_interval:
+        control_timer = time.monotonic()
+        
+        prev_timer += 1
 
         # IMU
         imu.update()
         for i in range(3):
             accel[i] = onepole(imu.accel_cur[i],accel[i],level_smoothing)
-        magnitude = smooth(get_magnitude(accel), magnitude, level_smoothing/2, level_smoothing/2+.5)
-#         print(accel, magnitude*10)
+        magnitude = smooth(get_magnitude(imu.accel_cur), magnitude, .0, .9)
+#         magnitude = get_magnitude(imu.accel_cur)
+#         print(tilt)
         tilt = get_tilt_angles(imu.accel_cur)
-        midi.force_send_cc(3, tilt[0]/2 + 45)
-        midi.force_send_cc(4, tilt[1]/2 + 45) 
-        midi.force_send_cc(5, tilt[2]/2 + 45)
+        midi.force_send_cc(3, tilt[0]/2 + 64)
+        midi.force_send_cc(4, tilt[1]/2 + 64) 
+        midi.force_send_cc(5, tilt[2]/2 + 64)
+        midi.force_send_cc(6, min(127, math.floor(magnitude*20*6)))
 
 
 
@@ -136,6 +142,11 @@ while True:
             for i in range (11):
                 msg.append(button[i].value)
             print(msg)
+            
+    if time.monotonic()-print_timer >= 1:
+        print_timer = time.monotonic()
+        print('timer', 1/prev_timer)
+        prev_timer = 0
 
         
         

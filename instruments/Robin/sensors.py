@@ -78,11 +78,11 @@ class TouchButton:
         self.button = touchio.TouchIn(self.pin)
         self.button.threshold = 100
         self.prev_state = False
-        self.value = self.button.raw_value
-        self.prev_raw = self.button.raw_value
+        self.value = 0
+        self.prev_raw = 0
         self.state = "up"
         self.smoothing = 0.5
-        self.baseline = self.button.raw_value
+        self.baseline = 50000
         self.baseline_smoothing = 1
         self.threshold = 100
         self.calibration_mode = False
@@ -93,17 +93,21 @@ class TouchButton:
         self.button.threshold = 10000
         
     def update(self):
+        # read and lowpass filter
         raw = self.button.raw_value * (1-self.smoothing) + self.prev_raw * self.smoothing
-        if raw > self.peak: self.peak = raw
         self.prev_raw = raw
-#         print(raw, self.prev_raw, self.baseline)
+        # set peak
+        if raw > self.peak: self.peak = raw
+        elif self.peak > self.baseline - 1000: self.peak -= 1
+        # update baseline
         if not self.button.value or self.calibration_mode:
             if raw < self.baseline:
                 self.baseline = raw
                 new_threshold =  self.baseline + self.threshold 
                 if new_threshold < 35535 :  self.button.threshold = math.floor(new_threshold)
-            else: self.baseline += self.baseline_smoothing
-        self.value = (raw - self.baseline)/self.peak
+            elif self.baseline < self.peak - 1000: self.baseline += self.baseline_smoothing
+            
+        if self.peak - self.baseline > 0: self.value = (raw - self.baseline)/(self.peak - self.baseline)
 #         if self.calibration_mode:
 #             if self.value < 50:
 #                 self.calibration_mode = False
@@ -135,7 +139,7 @@ class TouchButton:
         - "released"
         - None
         """
-        current = self.button.value
+        current = self.value > self.threshold
 
         if current != self.prev_state:
             self.prev_state = current
@@ -149,6 +153,7 @@ class TouchButton:
     def set_threshold(self, value):
         try:
             self.threshold = value
+            self.baseline = self.button.raw_value
 #             self.button.threshold = self.button.raw_value + self.threshold
         except Exception as e:
             print("bad threshold ", self.button.raw_value + self.threshold, e)
