@@ -28,7 +28,7 @@ button = [sensors.TouchButton(touchPins[i]) for i in range(num_touch)]
 # button[9].set_threshold(thresholds[9])
 # button[10].set_threshold(thresholds[10])
 
-thresholds= [ 0.08 for i in range(11)]
+thresholds= [ 5000 for i in range(11)]
 # thresholds[0] = 700
 # thresholds[8] = 1000
 # thresholds[9] = 1000
@@ -96,12 +96,12 @@ while True:
 #                 print(thresholds[0], value, button[i].value, button[i].calibration_mode)
                 button[i].calibration_mode = True
             if value == "pressed":
-                midi.send_note(scale[i], 127)
+                midi.send_note(i, 127)
 #                 if i == 0: update_thresholds()
                 msg.append(1)
             elif value == "down": msg.append(1)
             elif value == "released":
-                midi.send_note(scale[i], 0)
+                midi.send_note(i, 0)
                 msg.append(0)
             elif value == "up": msg.append(0)
             else: msg.append(0)
