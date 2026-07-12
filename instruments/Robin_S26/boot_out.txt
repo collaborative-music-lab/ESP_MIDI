@@ -1,0 +1,7 @@
+Adafruit CircuitPython 10.1.4 on 2026-03-09; Waveshare ESP32-S3-Zero with ESP32S3
+Board ID:waveshare_esp32_s3_zero
+UID:0587D781898E
+MAC:D0:9E:CB:3F:40:6B
+boot.py output:
+USB MIDI enabled, USB HID disabled
+Clock speed set to  80.0 MHz
