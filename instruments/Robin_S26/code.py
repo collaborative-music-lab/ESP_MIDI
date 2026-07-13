@@ -8,7 +8,7 @@ from imu_driver import IMU
 from imu_processing import *
 from midi_handler import MidiHandler
 
-DEBUG_TOUCH = True
+DEBUG_TOUCH = False
 DEBUG_CAP = False
 
 pot = [sensors.Pot(11)]
@@ -17,18 +17,10 @@ midi = midi_handler.MidiHandler( channel=0 )
 num_touch = 11
 touchPins = [8, 9, 10, 5, 4, 3, 2, 1, 13, 6, 7]
 button = [sensors.TouchButton(touchPins[i]) for i in range(num_touch)]
-# thresholds= [
-#     1000,
-#     1000, 300, 800,
-#     500, 160, 280, 260,
-#     500, 500, 400]
-# button[9].set_threshold(thresholds[9])
-# button[10].set_threshold(thresholds[10])
 
-thresholds= [ 100 for i in range(11)]
-thresholds[0] = 700
-thresholds[8] = 1000
-thresholds[9] = 1000
+thresholds= [ 0.5 for i in range(11)]
+# thresholds[8] = 1000
+# thresholds[9] = 1000
 # thresholds[10] = 25000
 
 
@@ -56,8 +48,8 @@ midi.on_note_on = note_on
 # arrors = [13,6]
 # strip = 7
     
-imu = IMU(board_type="LSM6", SDA=board.IO44, SCL=board.IO43)
-# imu = IMU(board_type="BMI160", SDA=board.IO44, SCL=board.IO43)
+# imu = IMU(board_type="LSM6", SDA=board.IO44, SCL=board.IO43)
+imu = IMU(board_type="BMI160", SDA=board.IO44, SCL=board.IO43)
 
 cap_timer = 0
 print_timer = 0

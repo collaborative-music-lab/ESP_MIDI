@@ -84,7 +84,7 @@ class TouchButton:
         self.smoothing = 0.5
         self.baseline = 50000
         self.baseline_smoothing = 1
-        self.threshold = 100
+        self.threshold = 0.3
         self.calibration_mode = False
         self.peak = 0
         
@@ -116,7 +116,8 @@ class TouchButton:
 #                 self.set_threshold(self.threshold)
 #         print(raw, self.value, self.baseline)
 #         self.state = self.get_state()
-        self.value = raw - self.baseline
+        if self.peak - self.baseline > 0:
+            self.value = (raw - self.baseline) / (self.peak - self.baseline)
         
     def get_state(self):
         """
