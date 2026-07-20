@@ -5,6 +5,7 @@ from adafruit_midi.note_off import NoteOff
 from adafruit_midi.control_change import ControlChange
 
 midi_debug = False
+print("MIDI ports:", usb_midi.ports)
 
 class MidiHandler:
     def __init__(self, channel = 0 ):
@@ -29,6 +30,7 @@ class MidiHandler:
         msg = self.midi.receive()
         
         if msg is not None:
+            print(msg)
             if isinstance(msg, NoteOn):
                 if self.on_note_on:
                     self.on_note_on(msg.note, msg.velocity)
@@ -37,7 +39,7 @@ class MidiHandler:
                     self.on_note_off(msg.note, msg.velocity)
             elif isinstance(msg, ControlChange):
                 if self.on_control_change:
-                    self.on_control_change(msg.controller, msg.value)
+                    self.on_control_change(msg.control, msg.value)
                     
 
     def send_note(self, note,vel,channel = 0):

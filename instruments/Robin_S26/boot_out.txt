@@ -5,3 +5,6 @@ MAC:D0:9E:CB:3F:40:6B
 boot.py output:
 USB MIDI enabled, USB HID disabled
 Clock speed set to  80.0 MHz
+Traceback (most recent call last):
+  File "boot.py", line 21, in <module>
+NameError: name 'storage' isn't defined

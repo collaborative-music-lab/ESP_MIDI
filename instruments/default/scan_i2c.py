@@ -4,16 +4,18 @@ import busio
 
 # Initialize I2C using the board's default SCL and SDA pins
 i2c = busio.I2C(board.D43, board.D44) #SCL, SDA
+counter = 0
 
 def scan_i2c():
-    
+    global counter
     # The bus must be locked before scanning
     while not i2c.try_lock():
         pass
 
     try:
         print("I2C Scanner active...")
-        print("Scanning...")
+        print("Scanning...", counter)
+        counter +=1
         
         # Scan returns a list of decimal addresses
         addresses = i2c.scan()

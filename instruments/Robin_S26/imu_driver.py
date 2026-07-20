@@ -5,13 +5,7 @@ import struct
 
 class IMU:
     def __init__(self, board_type="LSM6", SDA=board.IO43, SCL=board.IO44):
-        self._i2c_bus = None
-        
-        try:
-            self.i2c = busio.I2C(SCL, SDA) # Note: SCL is usually first in busio.I2C
-        except Exception as e:
-            print(f"Failed to create I2C bus: {e}")
-    
+        self.i2c = busio.I2C(SCL, SDA) # Note: SCL is usually first in busio.I2C
         self.BOARD = board_type
         # LSM6 0x6B, BMI 0x69
         self.DEVICE_ADDRESS = 0x6B if self.BOARD == "LSM6" else 0x69 
@@ -84,9 +78,6 @@ class IMU:
 
     def read_into_buffer(self, reg):
         """Helper to handle I2C locking and reading."""
-        if self._i2c_bus is None:
-            return False
-        
         while not self.i2c.try_lock(): pass
         try:
             self.i2c.writeto_then_readfrom(self.DEVICE_ADDRESS, bytes([reg]), self.buffer)
@@ -94,9 +85,6 @@ class IMU:
             self.i2c.unlock()
 
     def write_register(self, reg, value):
-        if self._i2c_bus is None:
-            return False
-        
         while not self.i2c.try_lock(): pass
         try:
             self.i2c.writeto(self.DEVICE_ADDRESS, bytes([reg, value]))
@@ -104,9 +92,6 @@ class IMU:
             self.i2c.unlock()
             
     def read_register(self, reg):
-        if self._i2c_bus is None:
-            return False
-        
         while not self.i2c.try_lock(): pass
         try:
             result = bytearray(1)
@@ -114,3 +99,4 @@ class IMU:
             return result[0]
         finally:
             self.i2c.unlock()
+

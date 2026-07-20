@@ -5,7 +5,13 @@ import struct
 
 class IMU:
     def __init__(self, board_type="LSM6", SDA=board.IO43, SCL=board.IO44):
-        self.i2c = busio.I2C(SCL, SDA) # Note: SCL is usually first in busio.I2C
+        self._i2c_bus = None
+        
+        try:
+            self.i2c = busio.I2C(SCL, SDA) # Note: SCL is usually first in busio.I2C
+        except Exception as e:
+            print(f"Failed to create I2C bus: {e}")
+    
         self.BOARD = board_type
         # LSM6 0x6B, BMI 0x69
         self.DEVICE_ADDRESS = 0x6B if self.BOARD == "LSM6" else 0x69 
@@ -31,11 +37,14 @@ class IMU:
         
         self.init_sensor()
         
+        self.poll_rate = 0.01 #in seconds
+        self.prev_time = 0
+        
     def init_sensor(self):
         if self.BOARD == "LSM6":
             # Enable Accel (104Hz, 2g) and Gyro (104Hz, 2000 dps)
             self.write_register(self.CTRL1_XL, 0x40) 
-            self.write_register(self.CTRL2_G, 0x40)
+            self.write_register(self.CTRL2_G, 0x4C)
         elif self.BOARD == "BMI160":
             # BMI160 Power-up sequence
             self.write_register(self.POWER_CMD, 0x11) # Accel to Normal Mode
@@ -44,6 +53,10 @@ class IMU:
             time.sleep(0.1)
 
     def update(self):
+        if time.monotonic() - self.prev_time > self.poll_rate:
+            self.prev_time = time.monotonic()
+        else: return 0
+        
         status = self.read_register(self.STATUS_REG)
         
         # Handle different status bits per chip
@@ -64,12 +77,16 @@ class IMU:
             self.read_into_buffer(self.GYRO_START_REG)
             raw = struct.unpack('<hhh', self.buffer)
             # 0.0001527 is for 125/250 dps (Check your sensor's FS setting!)
-            self.gyro_cur[:] = [val * 0.0001527 for val in raw] 
+            # 0.00003051757
+            self.gyro_cur[:] = [val * 0.00003051757 for val in raw] 
             
         return status
 
     def read_into_buffer(self, reg):
         """Helper to handle I2C locking and reading."""
+        if self._i2c_bus is None:
+            return False
+        
         while not self.i2c.try_lock(): pass
         try:
             self.i2c.writeto_then_readfrom(self.DEVICE_ADDRESS, bytes([reg]), self.buffer)
@@ -77,6 +94,9 @@ class IMU:
             self.i2c.unlock()
 
     def write_register(self, reg, value):
+        if self._i2c_bus is None:
+            return False
+        
         while not self.i2c.try_lock(): pass
         try:
             self.i2c.writeto(self.DEVICE_ADDRESS, bytes([reg, value]))
@@ -84,6 +104,9 @@ class IMU:
             self.i2c.unlock()
             
     def read_register(self, reg):
+        if self._i2c_bus is None:
+            return False
+        
         while not self.i2c.try_lock(): pass
         try:
             result = bytearray(1)
