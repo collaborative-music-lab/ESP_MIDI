@@ -1,0 +1,10 @@
+Adafruit CircuitPython 10.2.1 on 2026-05-13; Waveshare ESP32-S3-Zero with ESP32S3
+Board ID:waveshare_esp32_s3_zero
+UID:42CEA4F232C6
+MAC:FC:6D:CB:3F:40:59
+boot.py output:
+USB MIDI enabled, USB HID disabled
+Clock speed set to  80.0 MHz
+Traceback (most recent call last):
+  File "boot.py", line 26, in <module>
+NameError: name 'storage' isn't defined

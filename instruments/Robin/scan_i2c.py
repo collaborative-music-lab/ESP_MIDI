@@ -32,4 +32,4 @@ def scan_i2c():
 
 while True:
     scan_i2c()
-    time.sleep(5)  # Rescan every 5 seconds
+    time.sleep(1)  # Rescan every 5 seconds

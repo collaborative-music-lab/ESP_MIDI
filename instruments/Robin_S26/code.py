@@ -108,8 +108,7 @@ while True:
         # POTENTIOMETER
         value = pot[0].read()
         if value:
-            level_smoothing = 1 - math.pow(value/128,2)
-#             print(level_smoothing)
+#             print(value)
             midi.send_cc(0, value)
         
 

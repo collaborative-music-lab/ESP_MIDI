@@ -14,16 +14,29 @@ class Pot:
         self.pin =  getattr(board, f'D{pin}')
         self.pot = analogio.AnalogIn(self.pin)
         self.prev_value = 0
+        self.filtered = self.pot.value
+        self.alpha = 0.95
+        self.threshold = 400
+        self.max = 61960
+        self.dead = [0,60000]
 
     def read(self):
-        value = self.pot.value >> 9
-#         print (self.pot.value)
+        self.filtered = (1-self.alpha)*self.pot.value + self.alpha*self.filtered
+        value = math.floor(self.filtered)
+#         if value < 50000:
+#             if value < self.dead[1]: self.dead[1] = value
+#             if value > self.dead[0]: self.dead[0] = value
+#             print(self.dead)
+# #         print (self.pot.value)
+        if value > 33000 and value < 34000: return False
+        
         new_value = False
-        if value != self.prev_value:
+        if abs(value -  self.prev_value) > self.threshold:
             new_value = True
-        self.prev_value = value
+            self.prev_value = value
         if new_value is True:
-            return value
+#             print (value)
+            return value >> 9
         else:
             return False
         
