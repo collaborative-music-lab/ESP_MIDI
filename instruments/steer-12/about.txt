@@ -1,0 +1,35 @@
+steer-12 sequencer
+
+Performance sequencer with potentiometer for writing CV values, and 12-pad array for creating rhythms.
+- the rhythm array is configured in 1/4, 1/8, and 1/16 note steps.
+
+Button controls are:
+- 1 RECORD: holding this button and moving potentiometer will write data values into sequencer. 
+    - holding this button and touching pads will turn steps ON
+- 1 & 2 ERASE: holding this button and touching pads will turn steps OFF
+- 2 RATCHET: repeats the curret note. potentiometer will change divisions
+- 1&2&3 RECALL: hold and press a pad to recall a saved pattern
+- 3 DAMP: damps momentarily. hold 1&3 to set pads to DAMP. Potentiometer will set damp amount
+- 4 CV: record a secondary CV pattern
+- 1&2&3&4 SAVE:  hold and press a pad to save the current pattern to that pad
+
+LEDS:
+- 1: Flashes on beat 1
+- 2: Flashes when event is triggered. Dims acording to damp
+- 3: Flashes when a damped note is triggered
+- 4: shows current value of CV
+
+Pads:
+- press one pad to reset sequence to that step
+- press 2 pads to set reset sequece and set last step
+- press more than two pads to make a momentary loop
+
+Input:
+12 capsense inputs from MPR121
+4 buttons
+4 leds
+1 potentiometer
+
+Output:
+MIDI via USB
+MIDI via 1/8" TRS

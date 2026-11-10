@@ -1620,6 +1620,66 @@
 			(embedded_fonts no)
 		)
 	)
+	(text "MIDI"
+		(exclude_from_sim no)
+		(at 30.734 55.372 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+		(uuid "046fdcd6-757b-43d9-b308-b9b71ba2fa31")
+	)
+	(text "3.3v I2C / 5v power"
+		(exclude_from_sim no)
+		(at 24.384 71.12 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+		(uuid "04d0f613-eedd-4493-b2fb-57efa648644f")
+	)
+	(text "SS0"
+		(exclude_from_sim no)
+		(at 32.766 48.006 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+		(uuid "38da6fa1-ce73-4cdd-ac00-7dab511c0d45")
+	)
+	(text "UART"
+		(exclude_from_sim no)
+		(at 83.058 77.216 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+		(uuid "5e30a591-f750-4a6e-b4a6-4a0e9ef3f9d9")
+	)
+	(text "MI"
+		(exclude_from_sim no)
+		(at 32.512 78.232 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+		(uuid "877e7244-e37e-47ec-8028-46d650c102c3")
+	)
+	(text "SS1"
+		(exclude_from_sim no)
+		(at 32.004 62.992 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+		(uuid "ae4fa1d6-f5ea-404e-9d14-b5434749adf4")
+	)
 	(text "V2 updates pins to:\ns3 orig\n10 32\n11 37\n12 36\nNC 24"
 		(exclude_from_sim no)
 		(at 25.908 25.908 0)
@@ -1629,6 +1689,26 @@
 			)
 		)
 		(uuid "b4f5de78-b546-46f3-b57a-055919c5839e")
+	)
+	(text "MO"
+		(exclude_from_sim no)
+		(at 32.258 101.346 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+		(uuid "bf3d79ca-0ef6-4b26-9132-daaaacae87c7")
+	)
+	(text "CL"
+		(exclude_from_sim no)
+		(at 32.004 75.692 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+		(uuid "dc4820c8-a1f0-42ba-8200-5b3dc516044d")
 	)
 	(text "Keystone Electronics 3568\nPCB-mount, mini blade"
 		(exclude_from_sim no)
@@ -1784,6 +1864,16 @@
 	)
 	(wire
 		(pts
+			(xy 71.12 76.2) (xy 80.01 76.2)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "39869626-4aad-4808-8efc-9b48a1e44577")
+	)
+	(wire
+		(pts
 			(xy 35.56 88.9) (xy 44.45 88.9)
 		)
 		(stroke
@@ -1911,6 +2001,16 @@
 			(type default)
 		)
 		(uuid "6bd3a18e-a5ab-42a2-9043-12b43cad58a7")
+	)
+	(wire
+		(pts
+			(xy 36.83 48.26) (xy 44.45 48.26)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "6c6e6e2c-4b44-4c60-87ef-84e5234f757b")
 	)
 	(wire
 		(pts
@@ -2154,6 +2254,16 @@
 	)
 	(wire
 		(pts
+			(xy 71.12 78.74) (xy 78.74 78.74)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "fab897c2-eb95-4972-a274-597e6e6f1c43")
+	)
+	(wire
+		(pts
 			(xy 83.82 50.8) (xy 83.82 49.53)
 		)
 		(stroke
@@ -2202,6 +2312,16 @@
 		)
 		(uuid "17654d95-3fca-464f-bc6c-3b22d9b83e3b")
 	)
+	(label "IO0"
+		(at 73.66 78.74 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "280814fb-2640-4e1f-a7bb-c4934cfa99ac")
+	)
 	(label "IO4"
 		(at 172.72 71.12 0)
 		(effects
@@ -2211,6 +2331,16 @@
 			(justify left bottom)
 		)
 		(uuid "333f320e-3485-425e-a9c4-156931378e8c")
+	)
+	(label "SCL"
+		(at 35.56 73.66 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "34bd8d11-374c-4937-82eb-21a59f5af210")
 	)
 	(label "IO8"
 		(at 36.83 104.14 0)
@@ -2231,6 +2361,16 @@
 			(justify left bottom)
 		)
 		(uuid "427875db-db66-4ff3-960e-8af798b83b5b")
+	)
+	(label "IO8"
+		(at 36.83 76.2 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "4451aa17-4765-4e06-912f-030b2786b006")
 	)
 	(label "IO9"
 		(at 36.83 106.68 0)
@@ -2262,6 +2402,16 @@
 		)
 		(uuid "4ab26ab8-4504-4100-ab06-272d77c5c75b")
 	)
+	(label "IO1"
+		(at 73.66 76.2 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "522bea8f-a7fc-40cb-a9a6-0a2cd077440f")
+	)
 	(label "IO11"
 		(at 172.72 88.9 0)
 		(effects
@@ -2292,6 +2442,16 @@
 		)
 		(uuid "65f37f53-a2af-4658-8b0c-f33f3ba1bf47")
 	)
+	(label "IO10"
+		(at 38.1 63.5 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "6f23e00c-3606-4886-974d-290e428e6db3")
+	)
 	(label "IO11"
 		(at 72.39 88.9 0)
 		(effects
@@ -2312,6 +2472,16 @@
 		)
 		(uuid "734930fb-53fc-425d-b411-8dfebd453843")
 	)
+	(label "IO9"
+		(at 36.83 101.6 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "78e402e6-7f51-431b-9e28-231a5c2c87dc")
+	)
 	(label "IO4"
 		(at 36.83 83.82 0)
 		(effects
@@ -2331,6 +2501,26 @@
 			(justify left bottom)
 		)
 		(uuid "840721a2-9ba9-4d27-b832-5e61838aa98d")
+	)
+	(label "IO6"
+		(at 38.1 48.26 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "86bfcc1a-9c72-44d0-bb38-ebcc9ef67737")
+	)
+	(label "IO5"
+		(at 38.1 55.88 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "9072aee2-3247-459a-8c23-96db463c629f")
 	)
 	(label "IO2"
 		(at 36.83 93.98 0)
@@ -2442,6 +2632,16 @@
 		)
 		(uuid "d8ce9a83-e42f-4133-a40f-60d24edc2e43")
 	)
+	(label "SDA"
+		(at 35.56 71.12 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "dee3ea62-5ea7-4767-a1ca-a316b776cebb")
+	)
 	(label "IO10"
 		(at 172.72 86.36 0)
 		(effects
@@ -2451,6 +2651,16 @@
 			(justify left bottom)
 		)
 		(uuid "e49533af-1c1b-4ca0-ad13-548977fd95bd")
+	)
+	(label "IO7"
+		(at 36.83 78.74 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "ed9130fd-e7da-4821-b2d8-d945deee57c7")
 	)
 	(label "IO1"
 		(at 36.83 91.44 0)
