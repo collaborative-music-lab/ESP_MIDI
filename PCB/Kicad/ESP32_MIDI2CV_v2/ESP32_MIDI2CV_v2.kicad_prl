@@ -49,7 +49,7 @@
       "conflict_shadows",
       "shapes"
     ],
-    "visible_layers": "00000000_00000000_0e001020_ffff5551",
+    "visible_layers": "00000000_00000000_0e001020_ffff55f5",
     "zone_display_mode": 0
   },
   "git": {
@@ -60,7 +60,7 @@
     "ssh_key": ""
   },
   "meta": {
-    "filename": "ESP32_MIDI2CV.kicad_prl",
+    "filename": "ESP32_MIDI2CV_v2.kicad_prl",
     "version": 5
   },
   "net_inspector_panel": {

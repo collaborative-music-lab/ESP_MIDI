@@ -2978,22 +2978,10 @@
 		(uuid "182866f3-d9a6-4721-bce3-f83feb65db9d")
 	)
 	(junction
-		(at 250.19 26.67)
-		(diameter 0)
-		(color 0 0 0 0)
-		(uuid "214e65f7-49b2-441a-b797-b0a7a57b7248")
-	)
-	(junction
 		(at 110.49 43.18)
 		(diameter 0)
 		(color 0 0 0 0)
 		(uuid "223b6a17-c4d0-4dcd-a9e0-888c9f482f51")
-	)
-	(junction
-		(at 250.19 54.61)
-		(diameter 0)
-		(color 0 0 0 0)
-		(uuid "30398a42-fa29-43bb-a9c6-bbed7ac99617")
 	)
 	(junction
 		(at 156.21 50.8)
@@ -3056,50 +3044,16 @@
 		(uuid "a15f56e9-3cc1-4337-9744-f4af426bccbd")
 	)
 	(junction
-		(at 250.19 74.93)
-		(diameter 0)
-		(color 0 0 0 0)
-		(uuid "b25703e5-f494-452e-ab21-5914da1fdacb")
-	)
-	(junction
 		(at 190.5 63.5)
 		(diameter 0)
 		(color 0 0 0 0)
 		(uuid "da5971df-35b3-43f5-8b47-a7ca07cf7e11")
 	)
 	(junction
-		(at 250.19 43.18)
-		(diameter 0)
-		(color 0 0 0 0)
-		(uuid "dfab5a6c-72ed-4417-91b7-cbe494b59d87")
-	)
-	(junction
 		(at 166.37 63.5)
 		(diameter 0)
 		(color 0 0 0 0)
 		(uuid "ec25fe5a-b369-4695-ae16-802574df3d1b")
-	)
-	(junction
-		(at 250.19 40.64)
-		(diameter 0)
-		(color 0 0 0 0)
-		(uuid "edc5a398-c553-4f7d-8eb0-939b4f7bc887")
-	)
-	(junction
-		(at 250.19 72.39)
-		(diameter 0)
-		(color 0 0 0 0)
-		(uuid "f65b9e64-6e3a-4ad1-aa55-e06e91b885e4")
-	)
-	(wire
-		(pts
-			(xy 255.27 19.05) (xy 250.19 19.05)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "01d7c091-d1f9-416c-ba95-e7ff5e9e81d5")
 	)
 	(wire
 		(pts
@@ -3310,16 +3264,6 @@
 			(type default)
 		)
 		(uuid "20bbd506-d06f-43f1-a7ff-5117d3fc358b")
-	)
-	(wire
-		(pts
-			(xy 250.19 35.56) (xy 250.19 40.64)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "21e899f5-1d44-4f96-a58b-45e0389cacce")
 	)
 	(wire
 		(pts
@@ -3673,16 +3617,6 @@
 	)
 	(wire
 		(pts
-			(xy 255.27 67.31) (xy 250.19 67.31)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "81b81d2a-d0c9-4640-b6b5-3fc96d77c8a1")
-	)
-	(wire
-		(pts
 			(xy 36.83 147.32) (xy 39.37 147.32)
 		)
 		(stroke
@@ -3743,16 +3677,6 @@
 	)
 	(wire
 		(pts
-			(xy 250.19 19.05) (xy 250.19 26.67)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "8941a33d-cf09-4f1f-89e9-372f3d98eeef")
-	)
-	(wire
-		(pts
 			(xy 104.14 77.47) (xy 110.49 77.47)
 		)
 		(stroke
@@ -3780,16 +3704,6 @@
 			(type default)
 		)
 		(uuid "9047b5ef-18ed-4eac-a0a9-40fef8061b29")
-	)
-	(wire
-		(pts
-			(xy 250.19 49.53) (xy 250.19 54.61)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "93cc75d8-a755-401b-9682-84151ec0d0d9")
 	)
 	(wire
 		(pts
@@ -3823,16 +3737,6 @@
 	)
 	(wire
 		(pts
-			(xy 250.19 67.31) (xy 250.19 72.39)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "9ac6fa4a-2684-441a-bf02-ab45cf145d8d")
-	)
-	(wire
-		(pts
 			(xy 45.72 29.21) (xy 45.72 24.13)
 		)
 		(stroke
@@ -3860,16 +3764,6 @@
 			(type default)
 		)
 		(uuid "a3bcb0e7-2c0d-468f-a9b1-ecc66d217afd")
-	)
-	(wire
-		(pts
-			(xy 255.27 49.53) (xy 250.19 49.53)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "a696b584-e8c6-4db2-8d3b-cbcd8714b5e0")
 	)
 	(wire
 		(pts
@@ -3930,16 +3824,6 @@
 			(type default)
 		)
 		(uuid "b4e875b8-127a-40a3-bae4-72e0f81b01d9")
-	)
-	(wire
-		(pts
-			(xy 255.27 43.18) (xy 250.19 43.18)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "b6fafbd7-ec20-4822-a611-d21a4aaa8a35")
 	)
 	(wire
 		(pts
@@ -4043,16 +3927,6 @@
 	)
 	(wire
 		(pts
-			(xy 255.27 35.56) (xy 250.19 35.56)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "c53b2089-3903-4466-9b13-c892d892c4d8")
-	)
-	(wire
-		(pts
 			(xy 21.59 116.84) (xy 29.21 116.84)
 		)
 		(stroke
@@ -4080,16 +3954,6 @@
 			(type default)
 		)
 		(uuid "c718f7c0-aa3d-49cd-ad9a-8efd3091545b")
-	)
-	(wire
-		(pts
-			(xy 255.27 74.93) (xy 250.19 74.93)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "c8c5cc04-aefb-4ead-ac46-b75feafe30dd")
 	)
 	(wire
 		(pts
@@ -4391,7 +4255,7 @@
 		)
 		(uuid "1f4f8707-da13-4053-bf0c-fcd206860eea")
 	)
-	(label "A4"
+	(label "A8"
 		(at 22.86 116.84 0)
 		(effects
 			(font
@@ -4401,7 +4265,7 @@
 		)
 		(uuid "203db62d-5274-4161-b986-181565792fdb")
 	)
-	(label "A1"
+	(label "A5"
 		(at 54.61 41.91 0)
 		(effects
 			(font
@@ -4481,7 +4345,7 @@
 		)
 		(uuid "6271abc9-1c15-4b18-b380-f46782d1bd95")
 	)
-	(label "A0"
+	(label "A4"
 		(at 55.88 19.05 0)
 		(effects
 			(font
@@ -4491,7 +4355,7 @@
 		)
 		(uuid "a6fe1959-4f35-4f0a-9184-ed4500196898")
 	)
-	(label "A8"
+	(label "D0"
 		(at 25.4 152.4 0)
 		(effects
 			(font
@@ -4531,7 +4395,7 @@
 		)
 		(uuid "b4f8dc22-0a6e-49c0-9679-c5bf4a89c70a")
 	)
-	(label "A7"
+	(label "D1"
 		(at 25.4 147.32 0)
 		(effects
 			(font
@@ -4571,7 +4435,7 @@
 		)
 		(uuid "d4ee62ff-7f20-4db2-875b-ea4c384c0a03")
 	)
-	(label "A5"
+	(label "A7"
 		(at 22.86 121.92 0)
 		(effects
 			(font
@@ -4674,7 +4538,7 @@
 			(uuid "921dc750-aa73-4ffa-9a46-1d9195fd370e")
 		)
 		(instances
-			(project "ESP32_MIDI2CV"
+			(project "ESP32_MIDI2CV_v2"
 				(path "/41e4c161-2329-4e5f-9dd3-fb5a1db779ba"
 					(reference "R17")
 					(unit 1)
@@ -4757,7 +4621,7 @@
 			(uuid "2d39d425-1284-43df-a196-2b736a83db6f")
 		)
 		(instances
-			(project "ESP32_MIDI2CV"
+			(project "ESP32_MIDI2CV_v2"
 				(path "/41e4c161-2329-4e5f-9dd3-fb5a1db779ba"
 					(reference "JI2")
 					(unit 1)
@@ -4835,7 +4699,7 @@
 			(uuid "87568eb7-aea0-47db-a697-10bba318ee25")
 		)
 		(instances
-			(project "ESP32_MIDI2CV"
+			(project "ESP32_MIDI2CV_v2"
 				(path "/41e4c161-2329-4e5f-9dd3-fb5a1db779ba"
 					(reference "#PWR05")
 					(unit 1)
@@ -4916,7 +4780,7 @@
 			(uuid "70be25ff-146a-4416-b3b5-641d33e17c31")
 		)
 		(instances
-			(project "ESP32_MIDI2CV"
+			(project "ESP32_MIDI2CV_v2"
 				(path "/41e4c161-2329-4e5f-9dd3-fb5a1db779ba"
 					(reference "R15")
 					(unit 1)
@@ -4997,7 +4861,7 @@
 			(uuid "abfb9f71-2f57-47e3-9c43-0ddbd5338dcd")
 		)
 		(instances
-			(project "ESP32_MIDI2CV"
+			(project "ESP32_MIDI2CV_v2"
 				(path "/41e4c161-2329-4e5f-9dd3-fb5a1db779ba"
 					(reference "R8")
 					(unit 1)
@@ -5080,7 +4944,7 @@
 			(uuid "12d4ba1c-8f66-4684-a5bc-f35a9537d592")
 		)
 		(instances
-			(project "ESP32_MIDI2CV"
+			(project "ESP32_MIDI2CV_v2"
 				(path "/41e4c161-2329-4e5f-9dd3-fb5a1db779ba"
 					(reference "R10")
 					(unit 1)
@@ -5159,7 +5023,7 @@
 			(uuid "57b7ea78-30e4-4678-a56e-c0d0e3b7ad7b")
 		)
 		(instances
-			(project "ESP32_MIDI2CV"
+			(project "ESP32_MIDI2CV_v2"
 				(path "/41e4c161-2329-4e5f-9dd3-fb5a1db779ba"
 					(reference "#PWR017")
 					(unit 1)
@@ -5265,7 +5129,7 @@
 			(uuid "d7bd33f7-3bba-49da-b548-145d406b0bba")
 		)
 		(instances
-			(project "ESP32_MIDI2CV"
+			(project "ESP32_MIDI2CV_v2"
 				(path "/41e4c161-2329-4e5f-9dd3-fb5a1db779ba"
 					(reference "U1")
 					(unit 1)
@@ -5344,7 +5208,7 @@
 			(uuid "292b2503-aa56-43e8-83b1-1c3c7f76daf5")
 		)
 		(instances
-			(project "ESP32_MIDI2CV"
+			(project "ESP32_MIDI2CV_v2"
 				(path "/41e4c161-2329-4e5f-9dd3-fb5a1db779ba"
 					(reference "#PWR016")
 					(unit 1)
@@ -5427,7 +5291,7 @@
 			(uuid "fa23b0cd-9a7d-4fa5-87c3-76f7b0b01ace")
 		)
 		(instances
-			(project "ESP32_MIDI2CV"
+			(project "ESP32_MIDI2CV_v2"
 				(path "/41e4c161-2329-4e5f-9dd3-fb5a1db779ba"
 					(reference "R13")
 					(unit 1)
@@ -5512,7 +5376,7 @@
 			(uuid "efcfe210-615a-430c-ba37-50cee8e13b95")
 		)
 		(instances
-			(project "ESP32_MIDI2CV"
+			(project "ESP32_MIDI2CV_v2"
 				(path "/41e4c161-2329-4e5f-9dd3-fb5a1db779ba"
 					(reference "JO2")
 					(unit 1)
@@ -5598,7 +5462,7 @@
 			(uuid "8b6ea547-a873-47d8-91a4-9f9d5e53081c")
 		)
 		(instances
-			(project "ESP32_MIDI2CV"
+			(project "ESP32_MIDI2CV_v2"
 				(path "/41e4c161-2329-4e5f-9dd3-fb5a1db779ba"
 					(reference "D7")
 					(unit 1)
@@ -5683,7 +5547,7 @@
 			(uuid "fe65b3db-3e4a-4ce0-80c0-4b280211262b")
 		)
 		(instances
-			(project "ESP32_MIDI2CV"
+			(project "ESP32_MIDI2CV_v2"
 				(path "/41e4c161-2329-4e5f-9dd3-fb5a1db779ba"
 					(reference "JO4")
 					(unit 1)
@@ -5764,7 +5628,7 @@
 			(uuid "30a4c122-f4c9-47f4-83d2-893b1f78bd27")
 		)
 		(instances
-			(project "ESP32_MIDI2CV"
+			(project "ESP32_MIDI2CV_v2"
 				(path "/41e4c161-2329-4e5f-9dd3-fb5a1db779ba"
 					(reference "R18")
 					(unit 1)
@@ -5846,7 +5710,7 @@
 			(uuid "46c14160-9158-4ae0-a8bf-7c378cbc4d63")
 		)
 		(instances
-			(project "ESP32_MIDI2CV"
+			(project "ESP32_MIDI2CV_v2"
 				(path "/41e4c161-2329-4e5f-9dd3-fb5a1db779ba"
 					(reference "R1")
 					(unit 1)
@@ -5925,7 +5789,7 @@
 			(uuid "4f91f8a9-9662-46a6-b3c0-c38564db17f7")
 		)
 		(instances
-			(project "ESP32_MIDI2CV"
+			(project "ESP32_MIDI2CV_v2"
 				(path "/41e4c161-2329-4e5f-9dd3-fb5a1db779ba"
 					(reference "#PWR015")
 					(unit 1)
@@ -6008,7 +5872,7 @@
 			(uuid "f16fc9db-3b42-4baf-92a6-89ec52219c61")
 		)
 		(instances
-			(project "ESP32_MIDI2CV"
+			(project "ESP32_MIDI2CV_v2"
 				(path "/41e4c161-2329-4e5f-9dd3-fb5a1db779ba"
 					(reference "JI1")
 					(unit 1)
@@ -6088,7 +5952,7 @@
 			(uuid "88fe61bf-350e-4ffa-8e90-0de449fa2cce")
 		)
 		(instances
-			(project "ESP32_MIDI2CV"
+			(project "ESP32_MIDI2CV_v2"
 				(path "/41e4c161-2329-4e5f-9dd3-fb5a1db779ba"
 					(reference "R6")
 					(unit 1)
@@ -6167,7 +6031,7 @@
 			(uuid "0d36b854-5ddb-4654-a226-e630666ce6b6")
 		)
 		(instances
-			(project "ESP32_MIDI2CV"
+			(project "ESP32_MIDI2CV_v2"
 				(path "/41e4c161-2329-4e5f-9dd3-fb5a1db779ba"
 					(reference "#PWR010")
 					(unit 1)
@@ -6247,7 +6111,7 @@
 			(uuid "6b8191dc-4ba9-47ff-a9fa-b76d9b36039f")
 		)
 		(instances
-			(project "ESP32_MIDI2CV"
+			(project "ESP32_MIDI2CV_v2"
 				(path "/41e4c161-2329-4e5f-9dd3-fb5a1db779ba"
 					(reference "SW1")
 					(unit 1)
@@ -6347,7 +6211,7 @@
 			(uuid "46c0a479-f17b-4dd9-acb5-fce56d104c1e")
 		)
 		(instances
-			(project "ESP32_MIDI2CV"
+			(project "ESP32_MIDI2CV_v2"
 				(path "/41e4c161-2329-4e5f-9dd3-fb5a1db779ba"
 					(reference "U3")
 					(unit 1)
@@ -6427,7 +6291,7 @@
 			(uuid "3aa55626-5fb3-4ed5-a09e-396c431e4873")
 		)
 		(instances
-			(project "ESP32_MIDI2CV"
+			(project "ESP32_MIDI2CV_v2"
 				(path "/41e4c161-2329-4e5f-9dd3-fb5a1db779ba"
 					(reference "R4")
 					(unit 1)
@@ -6507,7 +6371,7 @@
 			(uuid "e5612b77-66b2-4e13-9af4-725a1c210f0e")
 		)
 		(instances
-			(project "ESP32_MIDI2CV"
+			(project "ESP32_MIDI2CV_v2"
 				(path "/41e4c161-2329-4e5f-9dd3-fb5a1db779ba"
 					(reference "C1")
 					(unit 1)
@@ -6589,7 +6453,7 @@
 			(uuid "51cb619f-1431-49b0-86bc-be6c0fe8067f")
 		)
 		(instances
-			(project "ESP32_MIDI2CV"
+			(project "ESP32_MIDI2CV_v2"
 				(path "/41e4c161-2329-4e5f-9dd3-fb5a1db779ba"
 					(reference "D4")
 					(unit 1)
@@ -6669,7 +6533,7 @@
 			(uuid "9c40cd12-ec0d-4beb-ab30-4457f8789ebf")
 		)
 		(instances
-			(project "ESP32_MIDI2CV"
+			(project "ESP32_MIDI2CV_v2"
 				(path "/41e4c161-2329-4e5f-9dd3-fb5a1db779ba"
 					(reference "#PWR08")
 					(unit 1)
@@ -6749,7 +6613,7 @@
 			(uuid "24098e1f-5140-46a4-b9bc-33ead247ff2c")
 		)
 		(instances
-			(project "ESP32_MIDI2CV"
+			(project "ESP32_MIDI2CV_v2"
 				(path "/41e4c161-2329-4e5f-9dd3-fb5a1db779ba"
 					(reference "R5")
 					(unit 1)
@@ -6827,7 +6691,7 @@
 			(uuid "1c1a873b-09e6-40da-9d17-cf6a9b6464f2")
 		)
 		(instances
-			(project "ESP32_MIDI2CV"
+			(project "ESP32_MIDI2CV_v2"
 				(path "/41e4c161-2329-4e5f-9dd3-fb5a1db779ba"
 					(reference "#PWR013")
 					(unit 1)
@@ -6956,7 +6820,7 @@
 			(uuid "4425f467-6017-459c-a5f4-84dbf12ffacd")
 		)
 		(instances
-			(project "ESP32_MIDI2CV"
+			(project "ESP32_MIDI2CV_v2"
 				(path "/41e4c161-2329-4e5f-9dd3-fb5a1db779ba"
 					(reference "U2")
 					(unit 1)
@@ -7041,7 +6905,7 @@
 			(uuid "963a93a4-0ef7-4cbf-ae50-1dc4fd7926be")
 		)
 		(instances
-			(project "ESP32_MIDI2CV"
+			(project "ESP32_MIDI2CV_v2"
 				(path "/41e4c161-2329-4e5f-9dd3-fb5a1db779ba"
 					(reference "JO3")
 					(unit 1)
@@ -7126,7 +6990,7 @@
 			(uuid "654f0f35-84b3-4f49-bf21-ba1b721ff6b2")
 		)
 		(instances
-			(project "ESP32_MIDI2CV"
+			(project "ESP32_MIDI2CV_v2"
 				(path "/41e4c161-2329-4e5f-9dd3-fb5a1db779ba"
 					(reference "JO1")
 					(unit 1)
@@ -7209,7 +7073,7 @@
 			(uuid "dc449276-a3b1-4aa7-b8b4-341e50e52ded")
 		)
 		(instances
-			(project "ESP32_MIDI2CV"
+			(project "ESP32_MIDI2CV_v2"
 				(path "/41e4c161-2329-4e5f-9dd3-fb5a1db779ba"
 					(reference "R11")
 					(unit 1)
@@ -7289,7 +7153,7 @@
 			(uuid "4b5dccbf-bf1a-4d50-9ec5-f421cd8238cd")
 		)
 		(instances
-			(project "ESP32_MIDI2CV"
+			(project "ESP32_MIDI2CV_v2"
 				(path "/41e4c161-2329-4e5f-9dd3-fb5a1db779ba"
 					(reference "#PWR06")
 					(unit 1)
@@ -7370,7 +7234,7 @@
 			(uuid "568d26be-644c-4999-ba55-085e17eb751f")
 		)
 		(instances
-			(project "ESP32_MIDI2CV"
+			(project "ESP32_MIDI2CV_v2"
 				(path "/41e4c161-2329-4e5f-9dd3-fb5a1db779ba"
 					(reference "R19")
 					(unit 1)
@@ -7448,7 +7312,7 @@
 			(uuid "7a52e54e-17bb-48fa-8e4c-eaecab75c981")
 		)
 		(instances
-			(project "ESP32_MIDI2CV"
+			(project "ESP32_MIDI2CV_v2"
 				(path "/41e4c161-2329-4e5f-9dd3-fb5a1db779ba"
 					(reference "#PWR02")
 					(unit 1)
@@ -7526,7 +7390,7 @@
 			(uuid "12008cf7-337a-464e-ba5b-b2f6fcaa0189")
 		)
 		(instances
-			(project "ESP32_MIDI2CV"
+			(project "ESP32_MIDI2CV_v2"
 				(path "/41e4c161-2329-4e5f-9dd3-fb5a1db779ba"
 					(reference "#PWR020")
 					(unit 1)
@@ -7604,7 +7468,7 @@
 			(uuid "d8cd35f5-2c4e-4bc8-8dd3-dae5b019421d")
 		)
 		(instances
-			(project "ESP32_MIDI2CV"
+			(project "ESP32_MIDI2CV_v2"
 				(path "/41e4c161-2329-4e5f-9dd3-fb5a1db779ba"
 					(reference "#PWR012")
 					(unit 1)
@@ -7682,7 +7546,7 @@
 			(uuid "3c2f600c-7073-49f5-9330-21db140bcc47")
 		)
 		(instances
-			(project "ESP32_MIDI2CV"
+			(project "ESP32_MIDI2CV_v2"
 				(path "/41e4c161-2329-4e5f-9dd3-fb5a1db779ba"
 					(reference "#PWR021")
 					(unit 1)
@@ -7762,7 +7626,7 @@
 			(uuid "df128075-9fc4-4cb2-a838-7cc1314389a9")
 		)
 		(instances
-			(project "ESP32_MIDI2CV"
+			(project "ESP32_MIDI2CV_v2"
 				(path "/41e4c161-2329-4e5f-9dd3-fb5a1db779ba"
 					(reference "#PWR011")
 					(unit 1)
@@ -7842,7 +7706,7 @@
 			(uuid "b6bbeacc-97e2-470d-adf1-e2264aa791cb")
 		)
 		(instances
-			(project "ESP32_MIDI2CV"
+			(project "ESP32_MIDI2CV_v2"
 				(path "/41e4c161-2329-4e5f-9dd3-fb5a1db779ba"
 					(reference "SW2")
 					(unit 1)
@@ -7928,7 +7792,7 @@
 			(uuid "73401eb3-45dd-4175-9d25-0fa7846ebb74")
 		)
 		(instances
-			(project "ESP32_MIDI2CV"
+			(project "ESP32_MIDI2CV_v2"
 				(path "/41e4c161-2329-4e5f-9dd3-fb5a1db779ba"
 					(reference "D8")
 					(unit 1)
@@ -8006,7 +7870,7 @@
 			(uuid "3faa013f-645a-4caa-84db-863e2fb8c05e")
 		)
 		(instances
-			(project "ESP32_MIDI2CV"
+			(project "ESP32_MIDI2CV_v2"
 				(path "/41e4c161-2329-4e5f-9dd3-fb5a1db779ba"
 					(reference "#PWR01")
 					(unit 1)
@@ -8084,7 +7948,7 @@
 			(uuid "b81b2f9e-f1b8-45bc-bc4f-cabffe25248b")
 		)
 		(instances
-			(project "ESP32_MIDI2CV"
+			(project "ESP32_MIDI2CV_v2"
 				(path "/41e4c161-2329-4e5f-9dd3-fb5a1db779ba"
 					(reference "#PWR04")
 					(unit 1)
@@ -8165,7 +8029,7 @@
 			(uuid "ad4d5b0e-0573-4a23-a199-0427f0968cd8")
 		)
 		(instances
-			(project "ESP32_MIDI2CV"
+			(project "ESP32_MIDI2CV_v2"
 				(path "/41e4c161-2329-4e5f-9dd3-fb5a1db779ba"
 					(reference "R16")
 					(unit 1)
@@ -8247,7 +8111,7 @@
 			(uuid "21b7a39e-937d-4e86-9d68-70029dfab6f2")
 		)
 		(instances
-			(project "ESP32_MIDI2CV"
+			(project "ESP32_MIDI2CV_v2"
 				(path "/41e4c161-2329-4e5f-9dd3-fb5a1db779ba"
 					(reference "D3")
 					(unit 1)
@@ -8326,7 +8190,7 @@
 			(uuid "60ff3e0d-ec41-4619-83a0-de648d9ee549")
 		)
 		(instances
-			(project "ESP32_MIDI2CV"
+			(project "ESP32_MIDI2CV_v2"
 				(path "/41e4c161-2329-4e5f-9dd3-fb5a1db779ba"
 					(reference "#PWR09")
 					(unit 1)
@@ -8406,7 +8270,7 @@
 			(uuid "a068a0a7-32f0-476b-906a-7319bb3c0c56")
 		)
 		(instances
-			(project "ESP32_MIDI2CV"
+			(project "ESP32_MIDI2CV_v2"
 				(path "/41e4c161-2329-4e5f-9dd3-fb5a1db779ba"
 					(reference "#PWR07")
 					(unit 1)
@@ -8485,7 +8349,7 @@
 			(uuid "e7aae063-e085-4244-80e9-29f7c65fa81e")
 		)
 		(instances
-			(project "ESP32_MIDI2CV"
+			(project "ESP32_MIDI2CV_v2"
 				(path "/41e4c161-2329-4e5f-9dd3-fb5a1db779ba"
 					(reference "#PWR03")
 					(unit 1)
@@ -8566,7 +8430,7 @@
 			(uuid "2f7bebd7-cfa1-4fdc-ad54-99605c7171d2")
 		)
 		(instances
-			(project "ESP32_MIDI2CV"
+			(project "ESP32_MIDI2CV_v2"
 				(path "/41e4c161-2329-4e5f-9dd3-fb5a1db779ba"
 					(reference "R14")
 					(unit 1)
@@ -8649,7 +8513,7 @@
 			(uuid "c7fea811-a49f-4588-8b7d-d90dfe4283e0")
 		)
 		(instances
-			(project "ESP32_MIDI2CV"
+			(project "ESP32_MIDI2CV_v2"
 				(path "/41e4c161-2329-4e5f-9dd3-fb5a1db779ba"
 					(reference "R12")
 					(unit 1)
@@ -8730,7 +8594,7 @@
 			(uuid "3abdb9fa-f17a-484d-8ff7-5db7088dd251")
 		)
 		(instances
-			(project "ESP32_MIDI2CV"
+			(project "ESP32_MIDI2CV_v2"
 				(path "/41e4c161-2329-4e5f-9dd3-fb5a1db779ba"
 					(reference "R9")
 					(unit 1)
@@ -8810,7 +8674,7 @@
 			(uuid "1964c11a-fcc9-4094-8011-cac6b1d284df")
 		)
 		(instances
-			(project "ESP32_MIDI2CV"
+			(project "ESP32_MIDI2CV_v2"
 				(path "/41e4c161-2329-4e5f-9dd3-fb5a1db779ba"
 					(reference "R7")
 					(unit 1)

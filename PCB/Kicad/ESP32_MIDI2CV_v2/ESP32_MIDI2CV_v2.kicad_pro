@@ -705,13 +705,13 @@
         "uuid": "41e4c161-2329-4e5f-9dd3-fb5a1db779ba"
       }
     ],
-    "used_designators": "#PWR9-10,#PWR18-21,D5-8,SW1-2,C2-3,R10-19",
+    "used_designators": "",
     "variants": []
   },
   "sheets": [
     [
       "41e4c161-2329-4e5f-9dd3-fb5a1db779ba",
-      "ESP32_MIDI2CV"
+      "ESP32_MIDI2CV_v2"
     ]
   ],
   "text_variables": {},
